@@ -1,0 +1,12 @@
+ideas
+- collision
+    - enemies
+- title screen
+    - highscore
+- rope
+    - tiles
+    - follows swinging character
+- gameover
+    - show text for gameover
+
+todo

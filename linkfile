@@ -1,0 +1,8 @@
+[objects]
+main.o
+game.o
+graphics.o
+interrupts.o
+strings.o
+
+[libraries]
