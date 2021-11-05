@@ -1,4 +1,4 @@
-TARGET	 = run.gb
+TARGET	 = rappel.gb
 AS	 = wla-gb
 ASFLAGS	 = -x
 LD	 = wlalink

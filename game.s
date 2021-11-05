@@ -76,9 +76,6 @@ HandleGameInput:
     daa
     ld (score+1), a
 +
-
-    ld a, 2
-    ld (pendingdraw), a
 @noincscore:
 
 @handledkeyhelds:
@@ -157,9 +154,35 @@ SetPlayerY:
     ret
 
 
-CheckWallCollision:
-    ld a, (player.x)		    ; check if player hit the walls
-    cp 160
+CheckCollision:
+    ; returns c flag where nc is collision
+
+    ; check side of screen collision
+    ld a, (player.x)
+    cp 160-16+4
+    jr c, +
+    cp -4
+    jr nc, +
+    ccf
+    ret				    ; collision
++
+
+    ; check collision with tiles
+    ld a, (player.y)
+    add 2
+    ld b, a
+    ld a, (player.x)
+    add 4
+    call FindMapBuffTile
+    ld a, (hl)
+    cp $0D
+    ret nc
+
+    ; check collision with objects
+    ; TODO
+
+@nocollision:
+    scf
     ret
 
 .ENDS

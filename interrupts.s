@@ -60,23 +60,6 @@ VBlankHandler:
     ld hl, ticks
     inc (hl)			; increment ticks
 
-    ; Check for pending draws
-    ld a, (pendingdraw)
-    jr z, @nopendingdraws
-    cp 1
-    jr nz, +
-    call ClearRow
-    xor a
-    ld (pendingdraw), a
-    jr @nopendingdraws
-+   cp 2
-    jr nz, @nopendingdraws
-    call PlaceCliff
-    ld a, 1
-    ld (pendingdraw), a
-@nopendingdraws:
-    ret
-
 .ENDS
 
 ; vim: filetype=wla

@@ -227,7 +227,6 @@ TitleSetup:
 TitleLoop:
     halt
     nop
-    call DMARoutine
     call ReadInput
     call HandleTitleInput
 
@@ -247,11 +246,6 @@ SetupGame:
     ld bc, $A33
     call BlankData
 
-    ; clear map buffer
-    ld hl, mapbuffer
-    ld bc, 14*32
-    call BlankData
-
     ; load tiles
     ld hl, Tiles
     ld de, $8000
@@ -261,7 +255,29 @@ SetupGame:
     ldh a, (R_DIV)	    ; get a random seed from the DIV timer register
     ld (seed), a
 
-    call FillMap	    ; fill map with blank wall tiles
+    ;call FillMap	    ; fill map with blank wall tiles
+    ; load in map
+    ld hl, TestMap
+    ld a, l		    ; store into currentmap pointer
+    ld (currentmap), a
+    ld a, h
+    ld (currentmap+1), a
+    ld de, $9800
+    ld b, 32		    ; lines to do
+--  ld c, 160/8		    ; individual tiles on row
+-   ldi a, (hl)
+    ld (de), a
+    inc de
+    dec c
+    jr nz, -
+    ld a, $20-$14	    ; offset to next row in map
+    add e
+    ld e, a
+    ld a, 0
+    adc d
+    ld d, a
+    dec b
+    jr nz, --
 
     ; set up player
     xor a
@@ -350,7 +366,7 @@ MainGameLoop:
 
 GameLogic:
     call ApplyVelX
-    call CheckWallCollision
+    call CheckCollision
     jr nc, GameoverSetup    ; gameover if side collision
     call SlowPlayerVel
     call SetPlayerY
@@ -438,11 +454,88 @@ Gameover:
 ;==============================================================================
 
 .SECTION "Lookup Tables" FREE
+
 ArcData:
 .INCLUDE "arc.i"
 
 SinData:
 .DBSIN 0, 180, 1, 160/2, 160/2
+
 .ENDS
+
+;==============================================================================
+; MAPS
+;==============================================================================
+
+.SECTION "Maps" FREE
+
+TestMap:
+.DB $0D, $0E, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $0F, $10, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $0D, $0E, $09, $0A, $09, $0A, $09, $0A, $0D, $0E
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $0F, $10, $0B, $0C, $0B, $0C, $0B, $0C, $0F, $10
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+.DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+
+.ENDS
+
 
 ; vim: filetype=wla

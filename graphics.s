@@ -143,7 +143,7 @@ ObjMove:
     adc h
     ld h, a			    ; hl is now the address of the tile
     
-    ld a, 8			    ; handle gameboy's weird sprite offsets
+    ld a, 8			    ; handle gameboy's sprite offsets
     add b
     ld b, a
     ld a, 16
@@ -314,7 +314,7 @@ ClearRow:
 
 
 FindMapTile:
-    ; Finds the map tile at a given x and y
+    ; Finds the map tile at a given x and y in VRAM
     ; a	    x
     ; b	    y
     ; Returns:
@@ -353,6 +353,54 @@ FindMapTile:
     adc h
     ld h, a
     ret
+
+
+FindMapBuffTile:
+    ; Finds the map tile at a given x and y
+    ; a	    x
+    ; b	    y
+    ; Returns:
+    ; hl    tile address
+
+    ; figure out tile x and y
+    srl a			    ; figure out x tile ordinate
+    srl a
+    srl a
+    ld d, a
+    ldh a, (R_SCY)		    ; figure out y tile ordinate
+    add b
+    srl a
+    srl a
+    srl a
+    and $1F			    ;	can only be tile 0-31
+    ld e, a
+
+    ; find address
+    ld a, (currentmap)
+    ld l, a
+    ld a, (currentmap+1)
+    ld h, a
+    ld a, e
+    ld c, a
+    cp $00
+    jr z, +
+-   ld a, l
+    add $14
+    ld l, a
+    ld a, 0
+    adc h
+    ld h, a
+    dec c
+    jr nz, -
++
+    ld a, d			    ; add the x offset now
+    add l
+    ld l, a
+    ld a, 0
+    adc h
+    ld h, a
+    ret
+
 
 .ENDS
 
