@@ -354,6 +354,26 @@ FindMapTile:
     ld h, a
     ret
 
+MapCoords:
+    ; finds map coordinates for x and y
+    ; a	    point x
+    ; b	    point y
+    ; returns:
+    ; a	    tile x
+    ; y	    tile y
+    srl a
+    srl a
+    srl a
+    ld c, a
+    ldh a, (R_SCY)
+    add b
+    srl a
+    srl a
+    srl a
+    and $1F			    ; can only be tile 0-31
+    ld b, a
+    ld a, c
+    ret
 
 FindMapBuffTile:
     ; Finds the map tile at a given x and y

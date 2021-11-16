@@ -174,7 +174,58 @@ CheckCollision:
     ld a, (player.x)
     add 4
     call FindMapBuffTile
-    ld a, (hl)
+
+    ldi a, (hl)			    ; top left tile
+    cp $0D
+    ret nc
+    ld a, (hl)			    ; top right tile
+    cp $0D
+    ret nc
+    ld a, $14-1			    ; bottom left tile is $14 to new line
+    add l			    ; then -1 to put it back one
+    ld l, a
+    ld a, 0
+    adc h
+    ld h, a
+
+    ; is hl greater than map end?
+    ld a, >TestMapEnd
+    cp h
+    jr nc, +
+    ; a < h	means hl > map
+    jr @submaplen
++   jr z, +
+    ; a > h	means hl < map
+    jr @nosubmaplen
++   ; a = h	means we need to check lsb
+    ld a, <TestMapEnd
+    cp l
+    jr nc, +
+    ; a < l	means hl > map
+    jr @submaplen
++   jr z, +
+    ; a > l	means hl < map
+    jr @nosubmaplen
++   ; a = l	means something is BAD
+@submaplen:
+    ; subtract map length
+    ld a, l
+    ld l, <TestMap_Len
+    sub l
+    ld l, a
+    ld a, h
+    ld h, >TestMap_Len
+    sbc h
+    ld h, a
+@nosubmaplen:
+    ; otherwise, continue
+
+
+    ld a, (hl)			    ; bottom left tile
+    cp $0D
+    ret nc
+    inc hl
+    ld a, (hl)			    ; bottom right tile
     cp $0D
     ret nc
 

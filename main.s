@@ -255,7 +255,6 @@ SetupGame:
     ldh a, (R_DIV)	    ; get a random seed from the DIV timer register
     ld (seed), a
 
-    ;call FillMap	    ; fill map with blank wall tiles
     ; load in map
     ld hl, TestMap
     ld a, l		    ; store into currentmap pointer
@@ -366,11 +365,12 @@ MainGameLoop:
 
 GameLogic:
     call ApplyVelX
-    call CheckCollision
-    jr nc, GameoverSetup    ; gameover if side collision
     call SlowPlayerVel
     call SetPlayerY
+    call CheckCollision
+    jr nc, GameoverSetup    ; gameover if side collision
 
+    ccf			    ; to fix when using daa with scorebar
     ; update scorebar
     ld a, (score+1)
     ld de, $9C0F
@@ -469,6 +469,9 @@ SinData:
 
 .SECTION "Maps" FREE
 
+.DEFINE TestMap_Len $14*$20	    ; $14 columns, $20 rows
+.EXPORT TestMap_Len
+
 TestMap:
 .DB $0D, $0E, $09, $0A, $09, $0A, $09, $0A, $09, $0A
 .DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
@@ -534,6 +537,7 @@ TestMap:
 .DB $09, $0A, $09, $0A, $09, $0A, $09, $0A, $09, $0A
 .DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
 .DB $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C
+TestMapEnd:
 
 .ENDS
 
