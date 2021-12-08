@@ -56,6 +56,39 @@ ScreenOff:
     ldh (R_LCDC), a
     ret
 
+ScreenFadeOut:
+.REPEAT 4
+    ldh a, (R_BGP)
+    sla a
+    sla a
+    ldh (R_BGP), a
+    halt
+    nop
+    halt
+    nop
+.ENDR
+    ret
+ScreenFadeIn:
+    ld a, %01000000
+    ldh (R_BGP), a
+    halt
+    nop
+    halt
+    nop
+    ld a, %10010000
+    ldh (R_BGP), a
+    halt
+    nop
+    halt
+    nop
+    ld a, %11100100
+    ldh (R_BGP), a
+    halt
+    nop
+    halt
+    nop
+    ret
+
 WaitFrames:
     ; waits n frames
     ; a	    number of frames to wait
@@ -192,6 +225,10 @@ SoftReset:
     ld hl, OAM
     ld bc, $100
     call BlankData
+    ; clear tilemap
+    ld hl, $9800
+    ld bc, $BFF
+    call BlankData
 
 TitleSetup:
     ; load title tiles
@@ -260,6 +297,7 @@ TitleLoop:
 
 
 SetupGame:
+    call ScreenFadeOut
     ; turn off screen
     xor a
     ldh (R_LCDC), a
@@ -349,6 +387,7 @@ SetupGame:
     ; turn on screen
     ld a, %10011011
     ldh (R_LCDC), a
+    call ScreenFadeIn
 
 MainGameLoop:
     ; score bar
@@ -404,6 +443,7 @@ GameLogic:
     call PrintInt
 
     jp MainGameLoop
+
 
 GameoverSetup:
     ld a, $02		    ; game state is now 2 (gameover)
