@@ -56,6 +56,17 @@ ScreenOff:
     ldh (R_LCDC), a
     ret
 
+WaitFrames:
+    ; waits n frames
+    ; a	    number of frames to wait
+    cp 0		    ; check it's not 0 first
+    ret z
+-   halt
+    nop
+    dec a
+    jp nz, -
+    ret
+
 ReadInput:
     ld a, (joypadNew)	    ; move old keypad state
     ld (joypadOld), a
@@ -193,7 +204,37 @@ TitleSetup:
     ld hl, title_map_data
     call LoadScreen
 
+    xor a
+    ldh (<state), a	    ; game state will be title
+    ld a, $60
+    ldh (R_SCY), a	    ; reset screen for scroll
+
+    ld a, %10010011         ; setup screen
+    ldh (R_LCDC), a
+
+    ld a, $01
+    ldh (R_IE), a           ; enable only vblank interrupt
+    ei
+
+    ; Title Animation
+-   ld a, 3
+    call WaitFrames
+    ldh a, (R_SCY)
+    dec a
+    ldh (R_SCY), a
+    jr nz, -
+    ld a, 20
+    call WaitFrames
+
     ; print strings
+    ld hl, Str_Author
+    ld de, $9A03
+    call PrintStr
+    ld hl, Str_Date
+    ld de, $9A28
+    call PrintStr
+    halt
+    nop
     ld hl, Str_Highscore
     ld de, $9803
     call PrintStr
@@ -206,23 +247,6 @@ TitleSetup:
     ld hl, Str_PressStart
     ld de, $99A4
     call PrintStr
-    ld hl, Str_Author
-    ld de, $9A03
-    call PrintStr
-    ld hl, Str_Date
-    ld de, $9A28
-    call PrintStr
-
-    xor a
-    ldh (<state), a	    ; game state will be title
-    ldh (R_SCY), a	    ; reset screen
-
-    ld a, %10010011         ; setup screen
-    ldh (R_LCDC), a
-
-    ld a, $01
-    ldh (R_IE), a           ; enable only vblank interrupt
-    ei
 
 TitleLoop:
     halt
