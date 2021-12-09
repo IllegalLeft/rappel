@@ -260,10 +260,17 @@ TitleSetup:
     ; Title Animation
 -   ld a, 3
     call WaitFrames
+    call ReadInput	    ; check if we need to skip it.
+    ldh a, (<joypadDiff)
+    and $FF
+    jr nz, @skipanimation
     ldh a, (R_SCY)
     dec a
     ldh (R_SCY), a
     jr nz, -
+@skipanimation
+    xor a
+    ldh (R_SCY), a
     ld a, 20
     call WaitFrames
 
