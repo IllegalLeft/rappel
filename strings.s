@@ -31,6 +31,8 @@ Str_Hi:
 .ASC "HI@"
 Str_Sc:
 .ASC "SC@"
+Str_GameOver:
+.ASC "GAMEOVER@"
 
 .ENDS
 

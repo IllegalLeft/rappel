@@ -236,6 +236,30 @@ CheckCollision:
     scf
     ret
 
+
+UpdateHighscore:
+    ; update highscore if score is greater than current highcore
+    ld hl, highscore+1
+    ld a, (score+1)
+    cp (hl)		    ; compare the upper byte first
+    jr z, @hscorelower	    ; if the upper byte is equal to...
+    jr nc, @hscoreupdate    ; if upper byte is greater than...
+    jr @nohscoreupdate	    ; no need to check as upper byte is lower
+@hscorelower:
+    dec hl		    ; check lower byte
+    ld a, (score)
+    cp (hl)
+    jr c, @nohscoreupdate   ; if lower bute is less than
+
+@hscoreupdate:		    ; new highscore!
+    ld hl, highscore
+    ld a, (score)
+    ldi (hl), a
+    ld a, (score+1)
+    ldi (hl), a
+@nohscoreupdate:
+    ret
+
 .ENDS
 
 ; vim: filetype=wla

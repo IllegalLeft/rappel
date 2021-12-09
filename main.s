@@ -62,6 +62,7 @@ ScreenFadeOut:
     sla a
     sla a
     ldh (R_BGP), a
+    ldh (R_OBP0), a
     halt
     nop
     halt
@@ -71,18 +72,21 @@ ScreenFadeOut:
 ScreenFadeIn:
     ld a, %01000000
     ldh (R_BGP), a
+    ldh (R_OBP0), a
     halt
     nop
     halt
     nop
     ld a, %10010000
     ldh (R_BGP), a
+    ldh (R_OBP0), a
     halt
     nop
     halt
     nop
     ld a, %11100100
     ldh (R_BGP), a
+    ldh (R_OBP0), a
     halt
     nop
     halt
@@ -448,27 +452,48 @@ GameLogic:
 GameoverSetup:
     ld a, $02		    ; game state is now 2 (gameover)
     ldh (<state), a
-    
-    ; update highscore if score is greater than current highcore
-    ld hl, highscore+1
-    ld a, (score+1)
-    cp (hl)		    ; compare the upper byte first
-    jr z, @hscorelower	    ; if the upper byte is equal to...
-    jr nc, @hscoreupdate    ; if upper byte is greater than...
-    jr @nohscoreupdate	    ; no need to check as upper byte is lower
-@hscorelower:
-    dec hl		    ; check lower byte
-    ld a, (score)
-    cp (hl)
-    jr c, @nohscoreupdate   ; if lower bute is less than
+    call UpdateHighscore
 
-@hscoreupdate:		    ; new highscore!
-    ld hl, highscore
-    ld a, (score)
+    ; load gameover tiles
+    ld hl, OAM.33	    ; starting OAM address
+    ld de, Str_GameOver	    ; start of text
+    ld b, $50		    ; y ordinate
+    ld c, $35		    ; starting x ordinate
+
+.REPEAT 3
+    ld a, b
     ldi (hl), a
-    ld a, (score+1)
+    ld a, c
     ldi (hl), a
-@nohscoreupdate:
+    add a, 8
+    ld c, a
+    ld a, (de)
+    ldi (hl), a
+    inc de
+    inc hl		    ; no flags
+.ENDR
+    ld a, b
+    ldi (hl), a
+    ld a, c
+    ldi (hl), a
+    add a, 16
+    ld c, a
+    ld a, (de)
+    ldi (hl), a
+    inc de
+    inc hl		    ; no flags
+.REPEAT 4
+    ld a, b
+    ldi (hl), a
+    ld a, c
+    ldi (hl), a
+    add a, 8
+    ld c, a
+    ld a, (de)
+    ldi (hl), a
+    inc de
+    inc hl		    ; no flags
+.ENDR
 
 Gameover:
     ; score bar
