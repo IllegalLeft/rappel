@@ -12,6 +12,14 @@ HandleGameInput:
     ; Key Down
     ldh a, (<joypadDiff)
     ld b, a		    ; store for later
+    and JOY_START
+    jr z, @checkright
+    ; Start
+    ld a, 3
+    ldh (<state), a
+    ret			    ; no need to do anything else, game is paused
+@checkright:
+    ld a, b
     and JOY_RIGHT
     jr z, @checkleft
     ; Right

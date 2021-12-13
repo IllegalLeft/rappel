@@ -9,6 +9,7 @@
     state	    DB		; 0 - title
 				; 1 - game
 				; 2 - game over
+				; 3 - pause
     joypadNew       DB
     joypadOld       DB
     joypadDiff      DB

@@ -436,13 +436,16 @@ MainGameLoop:
     xor %00001000	    ; swap to scorebar map
     ldh (R_LCDC), a
 
+    ldh a, (<state)
+    cp 3
+    jp z, PauseSetup
 
 GameLogic:
     call ApplyVelX
     call SlowPlayerVel
     call SetPlayerY
     call CheckCollision
-    jr nc, GameoverSetup    ; gameover if side collision
+    jp nc, GameoverSetup    ; gameover if side collision
 
     ccf			    ; to fix when using daa with scorebar
     ; update scorebar
@@ -454,6 +457,76 @@ GameLogic:
     call PrintInt
 
     jp MainGameLoop
+
+
+PauseSetup:
+    ; load pause tiles
+    ld hl, OAM.33	    ; starting OAM address
+    ld de, Str_Paused	    ; start of text
+    ld b, $50		    ; y ordinate
+    ld c, $40		    ; starting x ordinate
+
+.REPEAT 6
+    ld a, b
+    ldi (hl), a
+    ld a, c
+    ldi (hl), a
+    add a, 8
+    ld c, a
+    ld a, (de)
+    ldi (hl), a
+    inc de
+    inc hl		    ; no flags
+.ENDR
+
+PauseLoop:
+    ; score bar
+    ld a, $02		    ; enable STAT interrupt
+    ldh (R_IE), a
+    ld a, (R_LCDC)
+    xor %00001000
+    ld a, 7
+    ldh (R_LYC), a
+    xor a		    ; clear screen y for score bar
+    ldh (R_SCY), a
+
+    ; wait for score bar to end
+    halt
+    nop
+
+    ; main game view
+    ld a, (depth)	    ; low byte of depth is the screen y ordinate
+    ldh (R_SCY), a
+    ldh a, (R_LCDC)
+    xor %00001000	    ; switch map address
+    ldh (R_LCDC), a
+
+    ld a, $01
+    ldh (R_IE), a	    ; enable VBlank interrupt
+
+    call ReadInput
+
+    ; Vertical blank
+    halt
+    nop
+
+    ldh a, (R_LCDC)
+    xor %00001000	    ; swap to scorebar map
+    ldh (R_LCDC), a
+
+    ; check if unpaused
+    ldh a, (<joypadDiff)
+    and JOY_START
+    jr z, PauseLoop	    ; pause loop if not unpaused
+    ld a, 1		    ; set state to playing
+    ldh (<state), a
+
+    xor a
+    ld hl, OAM.33
+    ld bc, 8*4		    ; 8 OAM entries * 4 bytes
+    call BlankData	    ; remove sprites for paused text
+
+    jp MainGameLoop	    ; then resume main gameplay loop
 
 
 GameoverSetup:

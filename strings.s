@@ -33,6 +33,8 @@ Str_Sc:
 .ASC "SC@"
 Str_GameOver:
 .ASC "GAMEOVER@"
+Str_Paused:
+.ASC "PAUSED@"
 
 .ENDS
 
