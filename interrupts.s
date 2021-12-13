@@ -26,11 +26,7 @@
     jp $100
 
 .ORG $40            ; VBlank IRQ Vector
-    push af
-    push hl
     call VBlankHandler
-    pop hl
-    pop af
     reti
 
 .ORG $48            ; LCD IRQ Vector
@@ -55,11 +51,18 @@
 .SECTION "Interrupt Request Handlers" FREE
 
 VBlankHandler:
+    push af
+    push hl
+
     call DMARoutine
 
     ld hl, ticks
     inc (hl)			; increment ticks
 
+    pop hl
+    pop af
+
+    ret
 .ENDS
 
 ; vim: filetype=wla
