@@ -2,7 +2,6 @@
 ; HRAM
 ;==============================================================================
 
-
 .ENUM $FF80 EXPORT
     DMARoutine      DSB 10	; DMA Routine
     ticks	    DB
@@ -15,6 +14,11 @@
     joypadDiff      DB
 .ENDE
 
+.DEFINE STATE_TITLE	0
+.DEFINE STATE_GAME	1
+.DEFINE STATE_GAMEOVER	2
+.DEFINE STATE_PAUSE	3
+.EXPORT STATE_TITLE, STATE_GAME, STATE_GAMEOVER, STATE_PAUSE
 
 .DEFINE JOY_A	    1 << 0
 .DEFINE JOY_B	    1 << 1

@@ -15,7 +15,7 @@ HandleGameInput:
     and JOY_START
     jr z, @checkright
     ; Start
-    ld a, 3
+    ld a, STATE_PAUSE
     ldh (<state), a
     ret			    ; no need to do anything else, game is paused
 @checkright:

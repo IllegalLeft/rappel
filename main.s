@@ -154,7 +154,7 @@ HandleTitleInput:
     ldh a, (<joypadDiff) 
     and JOY_START
     jr z, @done
-    ld a, 1
+    ld a, STATE_GAME
     ldh (<state), a	    ; start the game
 @done:
     ret
@@ -245,8 +245,8 @@ TitleSetup:
     ld hl, title_map_data
     call LoadScreen
 
-    xor a
-    ldh (<state), a	    ; game state will be title
+    ld a, STATE_TITLE
+    ldh (<state), a
     ld a, $60
     ldh (R_SCY), a	    ; reset screen for scroll
 
@@ -303,7 +303,7 @@ TitleLoop:
     call HandleTitleInput
 
     ldh a, (<state)
-    cp 0
+    cp STATE_TITLE
     jr z, TitleLoop
 
 
@@ -437,7 +437,7 @@ MainGameLoop:
     ldh (R_LCDC), a
 
     ldh a, (<state)
-    cp 3
+    cp STATE_PAUSE
     jp z, PauseSetup
 
 GameLogic:
@@ -518,7 +518,7 @@ PauseLoop:
     ldh a, (<joypadDiff)
     and JOY_START
     jr z, PauseLoop	    ; pause loop if not unpaused
-    ld a, 1		    ; set state to playing
+    ld a, STATE_GAME	    ; set state to playing
     ldh (<state), a
 
     xor a
@@ -530,7 +530,7 @@ PauseLoop:
 
 
 GameoverSetup:
-    ld a, $02		    ; game state is now 2 (gameover)
+    ld a, STATE_GAMEOVER
     ldh (<state), a
     call UpdateHighscore
 
