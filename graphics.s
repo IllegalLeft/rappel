@@ -5,7 +5,7 @@
 .INCLUDE "gb_hardware.i"
 .INCLUDE "header.i"
 
-.DEFINE OAMBuffer   $C100
+.DEFINE OAMBuffer   $C000
 
 .SECTION "GraphicsCode" FREE
 

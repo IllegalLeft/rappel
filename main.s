@@ -227,7 +227,7 @@ SoftReset:
     ; clear OAM
     xor a
     ld hl, OAM
-    ld bc, $100
+    ld bc, 40*4
     call BlankData
     ; clear tilemap
     ld hl, $9800
@@ -247,7 +247,7 @@ TitleSetup:
 
     ld a, STATE_TITLE
     ldh (<state), a
-    ld a, $60
+    ld a, $64
     ldh (R_SCY), a	    ; reset screen for scroll
 
     ld a, %10010011         ; setup screen
