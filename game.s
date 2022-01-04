@@ -78,12 +78,17 @@ HandleGameInput:
     add 1
     daa
     ld (score), a
-    jr nc, +		    ; may need to handle carry
-    ld a, (score+1)
+    jr nc, +
+    ld a, (score+1)	    ; handle carry
     add 1
     daa
     ld (score+1), a
 +
+    ; increment mapy
+    ld hl, mapy
+    inc (hl)
+    inc (hl)
+    call PrepareMapRow
 @noincscore:
 
 @handledkeyhelds:
@@ -174,6 +179,8 @@ CheckCollision:
     ccf
     ret				    ; collision
 +
+    ; TODO: fix for 256 long mapbuffer
+    ret	; remove this when fixing
 
     ; check collision with tiles
     ld a, (player.y)
@@ -197,7 +204,7 @@ CheckCollision:
     ld h, a
 
     ; is hl greater than map end?
-    ld a, >TestMapEnd
+    ld a, >((mapbuffer)+_sizeof_mapbuffer)
     cp h
     jr nc, +
     ; a < h	means hl > map
@@ -206,7 +213,7 @@ CheckCollision:
     ; a > h	means hl < map
     jr @nosubmaplen
 +   ; a = h	means we need to check lsb
-    ld a, <TestMapEnd
+    ld a, <((mapbuffer)+_sizeof_mapbuffer)
     cp l
     jr nc, +
     ; a < l	means hl > map
@@ -218,11 +225,11 @@ CheckCollision:
 @submaplen:
     ; subtract map length
     ld a, l
-    ld l, <TestMap_Len
+    ld l, <_sizeof_mapbuffer
     sub l
     ld l, a
     ld a, h
-    ld h, >TestMap_Len
+    ld h, >_sizeof_mapbuffer
     sbc h
     ld h, a
 @nosubmaplen:

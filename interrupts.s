@@ -59,6 +59,13 @@ VBlankHandler:
     ld hl, ticks
     inc (hl)			; increment ticks
 
+    ; draw row if needed
+    ld a, (rowdrawsrc+1)
+    cp 0
+    jr z,@norowdraw
+    call DrawMapRow
+@norowdraw:
+
     pop hl
     pop af
 

@@ -100,6 +100,39 @@ FillMap:
     jr nz, --
     ret
 
+; tiles for empty space
+.DEFINE EMPTY_TL    $09
+.DEFINE EMPTY_TR    $0A
+.DEFINE EMPTY_BL    $0B
+.DEFINE EMPTY_BR    $0C
+InitMapBuffer:
+    ; fills mapbuffer (WRAM) with empty tiles graphics
+    ld c, 255
+    ld hl, mapbuffer
+--  ld b, 20
+-   ld a, EMPTY_TL
+    ldi (hl), a
+    dec b
+    ld a, EMPTY_TR
+    ldi (hl), a
+    dec b
+    jr nz, -
+    dec c
+    ;ret z
+    ld b, 20
+-   ld a, EMPTY_BL
+    ldi (hl), a
+    dec b
+    ld a, EMPTY_BR
+    ldi (hl), a
+    dec b
+    jr nz, -
+    dec c
+    ld a, $FF
+    cp c
+    jr nz, --
+    ret
+
 ObjInit:
     ; zeros out an object x and y (hiding it) and sets it's tile id
     ; a	    obj index num
@@ -396,10 +429,7 @@ FindMapBuffTile:
     ld e, a
 
     ; find address
-    ld a, (currentmap)
-    ld l, a
-    ld a, (currentmap+1)
-    ld h, a
+    ld hl, mapbuffer
     ld a, e
     ld c, a
     cp $00
@@ -421,6 +451,88 @@ FindMapBuffTile:
     ld h, a
     ret
 
+PrepareMapRow:
+    ; prepares a new map row (below screen) to draw in the next vblank
+    ; rowdrawsrc
+    ld hl, mapbuffer
+    ld a, (mapy)
+    add 18
+    cp 0
+    jr z, +			    ; if first row is 0 no need to add anything
+    ld c, a
+-   ld a, 20			    ; mapbuffer row len
+    add l
+    ld l, a
+    ld a, 0
+    adc h
+    ld h, a
+    dec c
+    jr nz, -
++
+    ld a, l
+    ld (rowdrawsrc), a
+    ld a, h
+    ld (rowdrawsrc+1), a
+
+    ; rowdrawdst
+    ; find screen row needing to be changed
+    ldh a, (R_SCY)
+    add 19*8
+    srl a
+    srl a
+    srl a
+    ld c, a
+    ld hl, $9800
+    cp 0
+    jr z, +			    ; if first row is 0, no need to add anything
+-   ld a, $20			    ; VRAM map row len
+    add l
+    ld l, a
+    ld a, 0
+    adc h
+    ld h, a
+    dec c
+    jr nz, -
++
+    ld a, l
+    ld (rowdrawdst), a
+    ld a, h
+    ld (rowdrawdst+1), a
+
+    ret
+
+DrawMapRow:
+    ; draws the next map row below the screen
+    ; runs during vblank
+    ld a, (rowdrawsrc)
+    ld l, a
+    ld a, (rowdrawsrc+1)
+    ld h, a
+    ld a, (rowdrawdst)
+    ld e, a
+    ld a, (rowdrawdst+1)
+    ld d, a
+    ld bc, 20
+    call MoveData
+
+    ; hl should be good
+    ld a, 12
+    add e
+    ld e, a
+    ld a, 0
+    adc d
+    ld d, a
+    ld bc, 20
+    call MoveData
+
+    ; clear source and dest addr
+    xor a
+    ld hl, rowdrawsrc
+    ldi (hl), a
+    ldi (hl), a
+    ldi (hl), a
+    ldi (hl), a
+    ret
 
 .ENDS
 
