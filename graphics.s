@@ -67,39 +67,6 @@ LoadScreen:
     jr nz, --
     ret
 
-FillMap:
-    ; fills tilemap with the empty tile for gameplay
-    ld b, $20			; height of full tile map
-    ld hl, $9800
-    ld de, $000C		; added to hl to go to next line later on
-    jr +			; skip some stuff for new set of tiles
---  add hl, de
-+   ; first row
-    ld c, $14			; width of 1 screen in tiles
--   ld a, $09
-    ldi (hl), a
-    inc a
-    ldi (hl), a
-    dec c
-    dec c
-    jr nz, -
-    dec b
-    ;ret z
-    ; second row
-    add hl, de			; go to next screen
-    ld c, $14
--   ld a, $0B
-    ldi (hl), a
-    inc a
-    ldi (hl), a
-    dec c
-    dec c
-    jr nz, -
-    ; repeat . . .
-    dec b
-    jr nz, --
-    ret
-
 ; tiles for empty space
 .DEFINE EMPTY_TL    $09
 .DEFINE EMPTY_TR    $0A
@@ -455,7 +422,13 @@ PrepareMapRow:
     ; prepares a new map row (below screen) to draw in the next vblank
     ; rowdrawsrc
     ld hl, mapbuffer
-    ld a, (mapy)
+    ld a, (depth+1)
+    ld b, a
+    ld a, (depth)
+.REPT 3
+    srl b
+    rra
+.ENDR
     add 18
     cp 0
     jr z, +			    ; if first row is 0 no need to add anything

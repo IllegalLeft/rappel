@@ -379,11 +379,7 @@ SetupGame:
     ldi (hl), a
     ldi (hl), a		    ; blank depth
     ld (hl), a
-    ld hl, mapy		    ; blank mapy
-    ldi (hl), a
-    ldi (hl), a
-    ldi (hl), a		    ; blank mapypix
-    ld (hl), a
+
 
     ; setup scorebar
     ld hl, Str_Hi

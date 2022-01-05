@@ -29,8 +29,6 @@
     depth	DW
     player      INSTANCEOF plyr
     screeny	DB		    ; for score bar
-    mapy	DB		    ; measured from top edge of screen, 0-256
-    mapypix	DB		    ; pixel offset for mapy
     currentmap	DW		    ; pointer to current map
     mapbuffer	DS 20*256
     rowdrawsrc	DW		    ; source address for row to draw

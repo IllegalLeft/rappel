@@ -84,10 +84,6 @@ HandleGameInput:
     daa
     ld (score+1), a
 +
-    ; increment mapy
-    ld hl, mapy
-    inc (hl)
-    inc (hl)
     call PrepareMapRow
 @noincscore:
 
