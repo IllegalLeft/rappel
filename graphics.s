@@ -386,19 +386,26 @@ FindMapBuffTile:
     srl a			    ; figure out x tile ordinate
     srl a
     srl a
+    ld c, a
+    ld a, (depth+1)		    ; figure out y tile ordinate
     ld d, a
-    ldh a, (R_SCY)		    ; figure out y tile ordinate
+    ld a, (depth)
     add b
-    srl a
-    srl a
-    srl a
-    and $1F			    ;	can only be tile 0-31
+    ld e, a
+    ld a, 0
+    adc d
+    ld d, a
+    ld a, e
+.REPT 3
+    srl d
+    rra
+.ENDR
     ld e, a
 
     ; find address
     ld hl, mapbuffer
     ld a, e
-    ld c, a
+    ld b, a
     cp $00
     jr z, +
 -   ld a, l
@@ -407,10 +414,10 @@ FindMapBuffTile:
     ld a, 0
     adc h
     ld h, a
-    dec c
+    dec b
     jr nz, -
 +
-    ld a, d			    ; add the x offset now
+    ld a, c			    ; add the x offset now
     add l
     ld l, a
     ld a, 0
