@@ -92,9 +92,6 @@ HandleGameInput:
 
 
 ApplyVelX:
-    ldh a, (<ticks)
-    and $01
-    jr nz, @applyvxend
     ld a, (player.velx)
     ld b, a
     bit 7, a		    ; is it negative?
@@ -118,19 +115,16 @@ ApplyVelX:
 
 
 SlowPlayerVel:
-    ldh a, (<ticks)
-    and $03
-    jr nz, @noslow
     ld a, (player.x)
     cp (160/2)-8
-    jr z, @noslow
+    ret z
     jr c, @lefthalf
     ; right half, left vel
     ; right half, right vel
     ld a, (player.velx)
     dec a
     ld (player.velx), a
-    jr @noslow
+    ret
 @lefthalf:
     ; left half, right vel
     ; left half, left vel
@@ -141,7 +135,6 @@ SlowPlayerVel:
 
     ld a, (player.velx)
     ld (player.velx), a
-@noslow:
     ret
 
 

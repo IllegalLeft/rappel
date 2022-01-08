@@ -449,8 +449,18 @@ MainGameLoop:
     jp z, PauseSetup
 
 GameLogic:
+    ldh a, (<ticks)	    ; only need to apply x vel every so many frames
+    and $01
+    jr nz, @noapplyvelx
     call ApplyVelX
+@noapplyvelx:
+
+    ldh a, (<ticks)	    ; only need to slow player vel every so many frames
+    and $03
+    jr nz, @noslow
     call SlowPlayerVel
+@noslow:
+
     call SetPlayerY
     call CheckCollision
     jp nc, GameoverSetup    ; gameover if side collision
