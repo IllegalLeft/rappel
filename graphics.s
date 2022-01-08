@@ -400,29 +400,24 @@ FindMapBuffTile:
     srl d
     rra
 .ENDR
-    ld e, a
 
-    ; find address
+    ; find address by starting with mapbuffer and adding 20*yord
     ld hl, mapbuffer
-    ld a, e
-    ld b, a
-    cp $00
-    jr z, +
--   ld a, l
-    add $14
-    ld l, a
-    ld a, 0
-    adc h
-    ld h, a
-    dec b
-    jr nz, -
-+
-    ld a, c			    ; add the x offset now
-    add l
-    ld l, a
-    ld a, 0
-    adc h
-    ld h, a
+    ld d, 0
+    ld e, a
+    sla e
+    rl d
+    sla e
+    rl d
+    add hl, de
+    sla e
+    rl d
+    sla e
+    rl d
+    add hl, de
+
+    ld b, 0			    ; c already is xord
+    add hl, bc			    ; add x offset
     ret
 
 PrepareMapRow:

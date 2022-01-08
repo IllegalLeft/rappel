@@ -176,7 +176,7 @@ CheckCollision:
     ret				    ; collision
 +
     ; TODO: fix for 256 long mapbuffer
-    ret	; remove this when fixing
+    ;ret	; remove this when fixing
 
     ; check collision with tiles
     ld a, (player.y)
