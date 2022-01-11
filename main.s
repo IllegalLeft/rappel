@@ -329,11 +329,12 @@ SetupGame:
     ld (seed), a
 
     call InitMapBuffer
+    call GenerateLevel
     
     ld hl, TestMap
     ld de, mapbuffer+80
     ld bc, 20*25
-    call MoveData
+    ;call MoveData
 
     ; load in map
     ld hl, TestMap

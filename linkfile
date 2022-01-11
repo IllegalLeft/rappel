@@ -3,6 +3,7 @@ main.o
 game.o
 graphics.o
 interrupts.o
+level.o
 strings.o
 
 [libraries]
