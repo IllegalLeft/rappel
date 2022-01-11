@@ -29,7 +29,6 @@
     depth	DW
     player      INSTANCEOF plyr
     screeny	DB		    ; for score bar
-    currentmap	DW		    ; pointer to current map
     mapbuffer	DS 20*256
     rowdrawsrc	DW		    ; source address for row to draw
     rowdrawdst	DW		    ; dest. address for row to draw
