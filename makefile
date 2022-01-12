@@ -1,28 +1,30 @@
 TARGET	 = rappel.gb
+SOURCES  = src
+INCLUDES = src
 AS	 = wla-gb
 ASFLAGS	 = -x
 LD	 = wlalink
-LDFLAGS	 = -v
-
+LDFLAGS	 = -S
 LINKFILE = linkfile
+
 SFILES	= $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
-OFILES 	= $(patsubst %.s, %.o, $(wildcard *.s))
+OFILES 	= $(patsubst %.s, %.o, $(wildcard $(SOURCES)/*.s))
 
 .PHONY: default all clean
-.PRECIOUS: $(TARGET) $(OBJECTS)
+.PRECIOUS: $(TARGET) $(OFILES)
 
 
 default: $(TARGET)
 all: default
 
 $(TARGET): $(OFILES)
-	$(LD) $(LDFLAGS) $(LINKFILE) $@
+	cd $(SOURCES) && $(LD) $(LDFLAGS) ../$(LINKFILE) ../$@
 
 %.o: %.s
-	$(AS) $(ASFLAGS) -o $@ $<
+	$(AS) $(ASFLAGS) -I $(INCLUDES) -o $@ $<
 
 
 clean:
 	-rm -f $(TARGET)
-	-rm -f *.o
+	-rm -f $(SOURCES)/*.o
 	-rm -f *.sym
