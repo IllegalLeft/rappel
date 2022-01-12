@@ -4,5 +4,5 @@ wla-gb graphics.s
 wla-gb interrupts.s
 wla-gb level.s
 wla-gb strings.s
-wlalink -S linkfile out.gb
+wlalink -S linkfile rappel.gb
 pause
