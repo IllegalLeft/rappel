@@ -363,6 +363,21 @@ SetupGame:
     ld (player.x), a
     call SetPlayerY
 
+    ; set up rope sprites
+    ld hl, OAM.5
+.REPEAT 4
+    ld a, 20
+    ldi (hl), a
+    ld a, (160/2)-4
+    ldi (hl), a
+    ld a, $5E
+    ldi (hl), a
+    xor a
+    ldi (hl), a
+.ENDR
+
+    call MoveRope
+
     xor a
     ld (player.velx), a	    ; blank velx
     ld hl, score	    ; blank score
@@ -456,7 +471,9 @@ GameLogic:
     call CheckCollision
     jp nc, GameoverSetup    ; gameover if side collision
 
-    ccf			    ; to fix when using daa with scorebar
+    call MoveRope
+
+    xor a		    ; clear carry flag for when using daa with scorebar
     ; update scorebar
     ld a, (score+1)
     ld de, $9C0F

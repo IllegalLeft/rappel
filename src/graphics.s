@@ -509,14 +509,74 @@ DrawMapRow:
     ldi (hl), a
     ret
 
+    
+MoveRope:
+    ; moves the rope sprites to where they should connect to the player
+    ; note: top point is (80, 8)
+
+    ; calculate slope
+    ld a, (player.x)
+    cp 72
+    jr c, +
+
+    ; swinging to the right
+    sub 72
+    srl a
+    srl a
+    ld d, a
+    jr ++
+    ; swinging to the left
++   ld d, a
+    ld a, 72
+    sub d
+    srl a
+    srl a
+    ld d, a
+++
+
+    ld a, (player.y)
+    srl a
+    srl a
+    ld e, a
+
+    ld b, 76+8		; for rope start pos. & oam x pos. offset
+    ld c, 8+16		; for rope start pos. & oam y pos. offset
+    ld hl, OAM.5
+.REPEAT 4
+    ld a, c
+    ldi (hl), a
+    add e
+    ld c, a
+
+    ld a, (player.x)
+    cp 72
+    jr c, +
+
+    ld a, b
+    ldi (hl), a
+    add d
+    ld b, a
+    jr ++
+
++   ld a, b
+    ldi (hl), a
+    sub d
+    ld b, a
+
+++  inc hl
+    inc hl
+.ENDR
+
+    ret
+
+
 .ENDS
 
 
 .SECTION "Tiles" FREE
 
 Tiles:
-.DB $00,$00,$00,$00,$00,$00,$00,$00
-.DB $00,$00,$00,$00,$00,$00,$00,$00
+.DB $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
 
 ; player sprites
 .DEFINE tiles_sprites_size  17 * 16
