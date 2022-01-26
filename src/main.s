@@ -370,7 +370,7 @@ SetupGame:
     ldi (hl), a
     ld a, (160/2)-4
     ldi (hl), a
-    ld a, $5E
+    ld a, TILE_ROPE
     ldi (hl), a
     xor a
     ldi (hl), a
