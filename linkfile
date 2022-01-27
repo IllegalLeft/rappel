@@ -4,6 +4,7 @@ game.o
 graphics.o
 interrupts.o
 level.o
+music.o
 strings.o
 
 [libraries]
