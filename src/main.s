@@ -327,6 +327,8 @@ SetupGame:
     xor a
     ldh (R_LCDC), a
 
+    call StopMusic
+
     ; clear tilemap    
     xor a
     ld hl, $9800

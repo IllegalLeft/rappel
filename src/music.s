@@ -32,6 +32,13 @@
 .SLOT 0
 .SECTION "MusicSubroutines" FREE
 
+StopMusic:
+    ld a, $00
+    ldh (R_NR52), a
+    ld a, $FF
+    ldh (R_NR52), a
+    ret
+
 LoadWaveform:
     ; hl    address to load from
     ld de, $FF30
