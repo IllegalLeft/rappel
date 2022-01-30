@@ -29,7 +29,7 @@
 ;==============================================================================
 ; SUBROUTINES
 ;==============================================================================
-.SLOT 1
+.SLOT 0
 .SECTION "MusicSubroutines" FREE
 
 LoadWaveform:
@@ -249,10 +249,13 @@ UpdateMusic:
     and $0F			; just note
 
     dec a			; entry 0 in LUT is C
-    add a			; pitch LUT is 2 bytes/ entry
+    add a			; pitch LUT is 2 bytes per entry
     ld hl, Pitches
     add l
     ld l, a
+    ld a, 0
+    adc h
+    ld h, a
     ldi a, (hl)			; get pitch value
     ld e, a
     ld a, (hl)

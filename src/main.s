@@ -217,6 +217,7 @@ Start:
 SoftReset:
     xor a
     ldh (R_IE), a	    ; no need for any interrupts
+    ldh (R_NR52), a	    ; no need for sound either
 -   ld a, (LY)		    ; wait vblank
     cp $91
     jr nz, -
@@ -252,6 +253,13 @@ TitleSetup:
 
     ld a, %10010011         ; setup screen
     ldh (R_LCDC), a
+
+    ld a, %10000000	    ; sound on
+    ldh (R_NR52), a
+    ld a, %00100010	    ; volume
+    ldh (R_NR50), a
+    ld a, $FF		    ; enable all channels to both L&R
+    ldh (R_NR51), a
 
     ld a, $01
     ldh (R_IE), a           ; enable only vblank interrupt
@@ -296,11 +304,17 @@ TitleSetup:
     ld de, $99A4
     call PrintStr
 
+    ld hl, Song_Rapel
+    call LoadMusic
+    ld hl, Wave_Tri
+    call LoadWaveform
+
 TitleLoop:
     halt
     nop
     call ReadInput
     call HandleTitleInput
+    call UpdateMusic
 
     ldh a, (<state)
     cp STATE_TITLE
