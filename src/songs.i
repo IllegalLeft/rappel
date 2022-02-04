@@ -98,7 +98,7 @@ Wave_SoftRamp:
 
 
 Song_Rapel:
-    .DB $0A             ; tempo
+    .DB $0C             ; tempo
     .DB $00, $00, $01   ; voices
     .DW Song_RapelCh0   ; channel scores
     .DW Song_RapelCh1
@@ -131,6 +131,67 @@ Song_RapelCh3:
     loop 16
     songend
     
+Song_RapelRedux:
+    .DB $0C                     ; tempo
+    .DB $00, $00, $01           ; voices
+    .DW Song_RapelReduxCh0      ; channel scores
+    .DW Song_RapelReduxCh1
+    .DW Song_RapelReduxCh2
+    .DW Song_RapelReduxCh3
+Song_RapelReduxCh0:
+.REPEAT 3
+    note C_, 3
+    rest 1
+    note F_, 3
+    rest 3
+    note C_, 3
+    rest 1
+    note D+, 3
+    rest 1
+    note G_, 2
+    note A+, 2
+    rest 1
+    note D_, 3
+    rest 2
+.ENDR
+    note C_, 3
+    rest 5
+    note C_, 3
+    rest 1
+    note D+, 3
+    rest 3
+    note G+, 2
+    rest 3
+    loop 13*3 + 8
+Song_RapelReduxCh1:
+    songend
+Song_RapelReduxCh2:
+.REPEAT 3
+    note C_, 2
+    rest 1
+    note C_, 2
+    rest 1
+    note D+, 2
+    rest 1
+    note C+, 2
+    rest 1
+    note C_, 2
+    rest 4
+    note G_, 2
+    note C+, 2
+    rest 1
+.ENDR
+    rest 8
+    rest 8
+    loop 13*3 + 2
+    songend
+Song_RapelReduxCh3:
+    .DB $01,$71,$01,$71
+    .DB $02,$01,$02,$01
+    .DB $01,$71,$01,$71
+    .DB $02,$01,$02,$01
+    loop 16
+    songend
 
 .ENDS
 

@@ -304,7 +304,7 @@ TitleSetup:
     ld de, $99A4
     call PrintStr
 
-    ld hl, Song_Rapel
+    ld hl, Song_RapelRedux
     call LoadMusic
     ld hl, Wave_Tri
     call LoadWaveform
@@ -327,7 +327,10 @@ SetupGame:
     xor a
     ldh (R_LCDC), a
 
+    ; halt music and load new music in
     call StopMusic
+    ld hl, Song_Rapel
+    call LoadMusic
 
     ; clear tilemap    
     xor a
@@ -425,6 +428,14 @@ SetupGame:
     ld a, 8		    ; set LYC
     ldh (R_LYC), a
 
+    ; turn on sound
+    ld a, %10000000	    ; sound on
+    ldh (R_NR52), a
+    ld a, %00100010	    ; volume
+    ldh (R_NR50), a
+    ld a, $FF		    ; enable all channels to both L&R
+    ldh (R_NR51), a
+
     ; turn on screen
     ld a, %10011011
     ldh (R_LCDC), a
@@ -457,6 +468,8 @@ MainGameLoop:
 
     call ReadInput
     call HandleGameInput
+
+    call UpdateMusic
 
     ; Vertical Blank
     halt 

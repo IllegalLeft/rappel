@@ -51,11 +51,15 @@ PlaceObstacle:
 GenerateLevel:
     ; generates a level with some randomly placed clifs
     ld c, 50
--   call RandByte
+-   call RandByte                   ; get a random y ordinate
     and %11111110		    ; cliff can only be on even numbered rows
     ld b, a
-    call RandByte
-    and %11111110		    ; cliff can only be even numbered columns
+    call RandByte                   ; get a random x ordinate
+    and %00011110		    ; cliff can only be even numbered columns
+    cp 20                           ; is it over 20? (mapbuff width)
+    jr c, +
+    jr -                            ; pick a new number
++
     push bc
     call PlaceObstacle
     pop bc
