@@ -533,6 +533,21 @@ PauseSetup:
     inc de
     inc hl		    ; no flags
 .ENDR
+    
+    ; blank out rope sprites by setting Y OAM byte to 0
+    xor a
+    ld hl, OAM.5
+    ld bc, 4		    ; 4 OAM entries * 4 bytes
+    ld d, a
+-   ldi (hl), a
+    inc hl
+    inc hl
+    inc hl
+    dec bc
+    or c
+    ld a, d
+    jr nz, -
+
 
 PauseLoop:
     ; score bar
