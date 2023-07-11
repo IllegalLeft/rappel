@@ -2,3 +2,6 @@
 *.o
 *.sym
 *.gb
+
+# Editing files
+*.swp
