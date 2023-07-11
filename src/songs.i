@@ -130,7 +130,7 @@ Song_RapelCh3:
     .DB $02,$01,$02,$01
     loop 16
     songend
-    
+
 Song_RapelRedux:
     .DB $0C                     ; tempo
     .DB $00, $00, $01           ; voices

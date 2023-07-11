@@ -142,7 +142,7 @@ ObjMove:
     ld a, 0
     adc h
     ld h, a			    ; hl is now the address of the tile
-    
+
     ld a, 8			    ; handle gameboy's sprite offsets
     add b
     ld b, a
@@ -331,7 +331,7 @@ FindMapTile:
     srl a
     srl a
     and $1F			    ; can only be tile 0-31
-    
+
     ; find address
     ld hl, $9800		    ; base address of map
     ld c, a
@@ -509,7 +509,7 @@ DrawMapRow:
     ldi (hl), a
     ret
 
-    
+
 MoveRope:
     ; moves the rope sprites to where they should connect to the player
     ; note: top point is (80, 8)

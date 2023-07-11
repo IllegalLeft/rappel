@@ -86,3 +86,5 @@
 .DEFINE R_WY    $4A
 .DEFINE R_WX    $4B
 .DEFINE R_IE    $FF
+
+; vim: filetype=wla

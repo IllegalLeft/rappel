@@ -2,7 +2,7 @@
 ;==============================================================================
 ;
 ; MUSIC.S
-; 
+;
 ; Samuel Volk
 ;
 ;==============================================================================
@@ -112,7 +112,7 @@ UpdateMusic:
     ret nz			; no update needed
     xor a			; zero music counter, will do an update
     ld (MusicTicks), a
-    
+
     ld c, 0			; start with channel 0
     ld b, 0
 @readSongData:
@@ -337,7 +337,7 @@ UpdateMusic:
     ld hl, NoiseSamples
     ld e, d
     ld d, 0
-    dec e 
+    dec e
     srl d
     rl e
     add hl, de

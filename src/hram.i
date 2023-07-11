@@ -6,9 +6,9 @@
     DMARoutine      DSB 10	; DMA Routine
     ticks	    DB
     state	    DB		; 0 - title
-				; 1 - game
-				; 2 - game over
-				; 3 - pause
+                                ; 1 - game
+                                ; 2 - game over
+                                ; 3 - pause
     joypadNew       DB
     joypadOld       DB
     joypadDiff      DB

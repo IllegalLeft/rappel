@@ -106,7 +106,7 @@ ApplyVelX:
     ld (player.x), a
     jr @applyvxend
 @movingright:		    ; or even stationary (vel = 0)
-			    ; no need to negate 2's compl. velx here
+                            ; no need to negate 2's compl. velx here
     ld a, (player.x)
     add b
     ld (player.x), a

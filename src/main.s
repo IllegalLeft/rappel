@@ -112,7 +112,7 @@ ReadInput:
     ld ($FF00), a
     ld a, ($FF00)	    ; read pad
     ld a, ($FF00)	    ; a bunch of times
-    cpl			    ; active low so flip 'er 
+    cpl			    ; active low so flip 'er
     and $0f		    ; only need last 4 bits
     swap a
     ld b, a
@@ -151,7 +151,7 @@ RandByte:
 .SECTION "Title Routines" FREE
 
 HandleTitleInput:
-    ldh a, (<joypadDiff) 
+    ldh a, (<joypadDiff)
     and JOY_START
     jr z, @done
     ld a, STATE_GAME
@@ -332,7 +332,7 @@ SetupGame:
     ld hl, Song_Rapel
     call LoadMusic
 
-    ; clear tilemap    
+    ; clear tilemap
     xor a
     ld hl, $9800
     ld bc, $A33
@@ -343,7 +343,7 @@ SetupGame:
     ld de, $8000
     ld bc, (tiles_sprites_size+1)
     call MoveData
-    
+
     ldh a, (R_DIV)	    ; get a random seed from the DIV timer register
     ld (seed), a
 
@@ -472,7 +472,7 @@ MainGameLoop:
     call UpdateMusic
 
     ; Vertical Blank
-    halt 
+    halt
     nop
 
     ldh a, (R_LCDC)
@@ -533,7 +533,7 @@ PauseSetup:
     inc de
     inc hl		    ; no flags
 .ENDR
-    
+
     ; blank out rope sprites by setting Y OAM byte to 0
     xor a
     ld hl, OAM.5
