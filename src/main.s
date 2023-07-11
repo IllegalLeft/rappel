@@ -109,17 +109,17 @@ ReadInput:
     ld (joypadOld), a
 
     ld a, $20		    ; select P14
-    ld ($FF00), a
-    ld a, ($FF00)	    ; read pad
-    ld a, ($FF00)	    ; a bunch of times
+    ld (_IO), a
+    ld a, (_IO)	    ; read pad
+    ld a, (_IO)	    ; a bunch of times
     cpl			    ; active low so flip 'er
     and $0f		    ; only need last 4 bits
     swap a
     ld b, a
     ld a, $10
-    ld ($FF00), a	    ; select P15
-    ld a, ($FF00)
-    ld a, ($FF00)
+    ld (_IO), a	    ; select P15
+    ld a, (_IO)
+    ld a, (_IO)
     cpl
     and $0F		    ; only need last 4 bits
     or b		    ; put a and b together
@@ -134,7 +134,7 @@ ReadInput:
     ld (joypadDiff), a
 
     ld a, $30		    ; reset joypad
-    ld ($FF00), a
+    ld (_IO), a
     ret
 
 RandByte:
@@ -179,13 +179,13 @@ Start:
     ldh (R_NR52), a         ; turn off sound
 
     ;xor a
-    ld hl, $C000
+    ld hl, _WRAM
     ld bc, $2000-4
     call BlankData          ; blank WRAM
-    ld hl, $8000
+    ld hl, _VRAM
     ld bc, $2000
     call BlankData          ; blank VRAM
-    ld hl, $FF80
+    ld hl, _HRAM
     ld bc, $FFFE-$FF80
     call BlankData	    ; blank HRAM
 
@@ -203,7 +203,7 @@ Start:
 
     ; load font tiles
     ld hl, tiles_font
-    ld de, $8500
+    ld de, _VRAM+$500
     ld bc, tiles_font_size
     call MoveData
 
@@ -231,14 +231,14 @@ SoftReset:
     ld bc, 40*4
     call BlankData
     ; clear tilemap
-    ld hl, $9800
+    ld hl, _MAP0
     ld bc, $BFF
     call BlankData
 
 TitleSetup:
     ; load title tiles
     ld hl, title_tile_data
-    ld de, $8000
+    ld de, _VRAM
     ld bc, title_tile_data_size
     call MoveData
 
@@ -334,13 +334,13 @@ SetupGame:
 
     ; clear tilemap
     xor a
-    ld hl, $9800
+    ld hl, _MAP0
     ld bc, $A33
     call BlankData
 
     ; load tiles
     ld hl, Tiles
-    ld de, $8000
+    ld de, _VRAM
     ld bc, (tiles_sprites_size+1)
     call MoveData
 
@@ -352,7 +352,7 @@ SetupGame:
 
     ; load in visible map
     ld hl, mapbuffer
-    ld de, $9800
+    ld de, _MAP0
     ld b, 25		    ; lines to do
 --  ld c, 160/8		    ; individual tiles on row
 -   ldi a, (hl)

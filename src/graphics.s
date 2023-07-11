@@ -5,7 +5,7 @@
 .INCLUDE "gb_hardware.i"
 .INCLUDE "header.i"
 
-.DEFINE OAMBuffer   $C000
+.DEFINE OAMBuffer   _WRAM
 
 .SECTION "GraphicsCode" FREE
 
@@ -49,7 +49,7 @@ PrintInt:
 
 LoadScreen:
     ; hl    map source
-    ld de, $9800
+    ld de, _MAP0
     ld c, $12
 --  ld b, $14
 -   ldi a, (hl)
@@ -224,7 +224,7 @@ PlaceCliff:
     add 16+144			    ; find bottom of screen + a row
     and $F0			    ; a / 16
     swap a
-    ld de, $9800		    ; base address for tiles
+    ld de, _MAP0		    ; base address for tiles
     cp 0
     jr z, +
     ld c, a
@@ -274,7 +274,7 @@ ClearRow:
     sub $10			    ; should do the row above the current toprow
     and $F0			    ; a / 16
     swap a			    ; a/16
-    ld hl, $9800		    ; base address for tilemap
+    ld hl, _MAP0		    ; base address for tilemap
     cp 0
     jr z, +
     ld c, a
@@ -333,7 +333,7 @@ FindMapTile:
     and $1F			    ; can only be tile 0-31
 
     ; find address
-    ld hl, $9800		    ; base address of map
+    ld hl, _MAP0		    ; base address of map
     ld c, a
     cp $00
     jr z, +
@@ -457,7 +457,7 @@ PrepareMapRow:
     srl a
     srl a
     ld c, a
-    ld hl, $9800
+    ld hl, _MAP0
     cp 0
     jr z, +			    ; if first row is 0, no need to add anything
 -   ld a, $20			    ; VRAM map row len

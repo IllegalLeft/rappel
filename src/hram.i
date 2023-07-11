@@ -2,7 +2,7 @@
 ; HRAM
 ;==============================================================================
 
-.ENUM $FF80 EXPORT
+.ENUM _HRAM EXPORT
     DMARoutine      DSB 10	; DMA Routine
     ticks	    DB
     state	    DB		; 0 - title
