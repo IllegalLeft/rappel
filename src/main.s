@@ -420,12 +420,13 @@ SetupGame:
     ld de, $9C0C
     call PrintStr
 
-    ; setup scorebar interrupt
-    ld a, $02		    ; enable STAT interrupt
+
+    ld a, %00000011         ; LCD STAT & VBlank interrupt
     ldh (R_IE), a
+    ; setup scorebar interrupt
     ld a, %01000000	    ; enable LYC=LY STAT interrupt
     ldh (R_STAT), a
-    ld a, 8		    ; set LYC
+    ld a, 8                 ; set LYC
     ldh (R_LYC), a
 
     ; turn on sound
@@ -443,17 +444,9 @@ SetupGame:
 
 MainGameLoop:
     ; score bar
-    ld a, $02		    ; enable STAT interrupt
-    ldh (R_IE), a
-    ld a, (R_LCDC)
-    xor %00001000
-    ld a, 7
-    ldh (R_LYC), a
     xor a		    ; clear screen y for score bar
     ldh (R_SCY), a
-
-    ; wait for score bar to end
-    halt
+    halt                    ; wait for score bar to end
     nop
 
     ; main game view
@@ -462,9 +455,6 @@ MainGameLoop:
     ldh a, (R_LCDC)
     xor %00001000	    ; switch map address
     ldh (R_LCDC), a
-
-    ld a, $01
-    ldh (R_IE), a	    ; enable VBlank interrupt
 
     call ReadInput
     call HandleGameInput
@@ -551,17 +541,9 @@ PauseSetup:
 
 PauseLoop:
     ; score bar
-    ld a, $02		    ; enable STAT interrupt
-    ldh (R_IE), a
-    ld a, (R_LCDC)
-    xor %00001000
-    ld a, 7
-    ldh (R_LYC), a
     xor a		    ; clear screen y for score bar
     ldh (R_SCY), a
-
-    ; wait for score bar to end
-    halt
+    halt                    ; wait for score bar to end
     nop
 
     ; main game view
@@ -570,9 +552,6 @@ PauseLoop:
     ldh a, (R_LCDC)
     xor %00001000	    ; switch map address
     ldh (R_LCDC), a
-
-    ld a, $01
-    ldh (R_IE), a	    ; enable VBlank interrupt
 
     call ReadInput
 
@@ -647,12 +626,6 @@ GameoverSetup:
 
 Gameover:
     ; score bar
-    ld a, $02		    ; enable STAT interrupt
-    ldh (R_IE), a
-    ld a, (R_LCDC)
-    xor %00001000
-    ld a, 7
-    ldh (R_LYC), a
     xor a		    ; clear screen y for score bar
     ldh (R_SCY), a
 
@@ -666,9 +639,6 @@ Gameover:
     ldh a, (R_LCDC)
     xor %00001000	    ; switch map address
     ldh (R_LCDC), a
-
-    ld a, $01
-    ldh (R_IE), a	    ; enable VBlank interrupt
 
     call ReadInput
 
