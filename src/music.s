@@ -48,7 +48,7 @@ StopMusic:
 
 LoadWaveform:
     ; hl    address to load from
-    ld de, $FF30
+    ld de, _WAVERAM
     ld c, 16
 -   ldi a, (hl)
     ld (de), a

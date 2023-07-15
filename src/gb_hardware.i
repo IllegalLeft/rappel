@@ -10,6 +10,7 @@
 .DEFINE _WRAMBANK   $D000
 .DEFINE _OAM        $FE00
 .DEFINE _IO         $FF00
+.DEFINE _WAVERAM    $FF30
 .DEFINE _HRAM       $FF80
 
 ;==============================================================================
