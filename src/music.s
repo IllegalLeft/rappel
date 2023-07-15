@@ -33,10 +33,17 @@
 .SECTION "MusicSubroutines" FREE
 
 StopMusic:
-    ld a, $00
-    ldh (R_NR52), a
-    ld a, $FF
-    ldh (R_NR52), a
+    ; disabling channels like this is supposed to prevent audio popping
+    ld a, $08
+    ldh (R_NR12), a
+    ldh (R_NR22), a
+    ldh (R_NR32), a
+    ldh (R_NR42), a
+    ld a, $80
+    ldh (R_NR14), a
+    ldh (R_NR24), a
+    ldh (R_NR34), a
+    ldh (R_NR44), a
     ret
 
 LoadWaveform:

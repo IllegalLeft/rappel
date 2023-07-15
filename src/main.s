@@ -505,6 +505,8 @@ GameLogic:
 
 
 PauseSetup:
+    call StopMusic
+
     ; load pause tiles
     ld hl, OAM.33	    ; starting OAM address
     ld de, Str_Paused	    ; start of text
@@ -582,6 +584,8 @@ GameoverSetup:
     ld a, STATE_GAMEOVER
     ldh (<state), a
     call UpdateHighscore
+
+    call StopMusic
 
     ; load gameover tiles
     ld hl, OAM.33	    ; starting OAM address
