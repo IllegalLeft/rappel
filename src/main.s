@@ -248,7 +248,7 @@ TitleSetup:
 
     ld a, STATE_TITLE
     ldh (<state), a
-    ld a, $64
+    ld a, $80
     ldh (R_SCY), a	    ; reset screen for scroll
 
     ld a, %10010011         ; setup screen
@@ -273,7 +273,8 @@ TitleSetup:
     and $FF
     jr nz, @skipanimation
     ldh a, (R_SCY)
-    dec a
+    inc a
+    inc a
     ldh (R_SCY), a
     jr nz, -
 @skipanimation
