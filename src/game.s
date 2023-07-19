@@ -116,7 +116,7 @@ ApplyVelX:
 
 SlowPlayerVel:
     ld a, (player.x)
-    cp (160/2)-8
+    cp (SCREEN_W/2)-8
     ret z
     jr c, @lefthalf
     ; right half, left vel
@@ -161,7 +161,7 @@ CheckCollision:
 
     ; check side of screen collision
     ld a, (player.x)
-    cp 160-16+4
+    cp SCREEN_W-16+4
     jr c, +
     cp -4
     jr nc, +

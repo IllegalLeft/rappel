@@ -355,7 +355,7 @@ SetupGame:
     ld hl, mapbuffer
     ld de, _MAP0
     ld b, 25		    ; lines to do
---  ld c, 160/8		    ; individual tiles on row
+--  ld c, SCREEN_W/8	    ; individual tiles on row
 -   ldi a, (hl)
     ld (de), a
     inc de
@@ -379,7 +379,7 @@ SetupGame:
     ld c, 20
     call ObjMove
 
-    ld a, (160/2)-8	    ; place player in center
+    ld a, (SCREEN_W/2)-8    ; place player in center
     ld (player.x), a
     call SetPlayerY
 
@@ -388,7 +388,7 @@ SetupGame:
 .REPEAT 4
     ld a, 20
     ldi (hl), a
-    ld a, (160/2)-4
+    ld a, (SCREEN_W/2)-4
     ldi (hl), a
     ld a, TILE_ROPE
     ldi (hl), a
@@ -671,9 +671,6 @@ Gameover:
 
 ArcData:
 .INCLUDE "arc.i"
-
-SinData:
-.DBSIN 0, 180, 1, 160/2, 160/2
 
 .ENDS
 
