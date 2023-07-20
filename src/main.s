@@ -242,13 +242,16 @@ TitleSetup:
     ld bc, title_tile_data_size
     call MoveData
 
-    ; load title map data
+    ; draw title mountain
+    ld b, 20
+    ld c, 8
+    ld de, _MAP0
     ld hl, title_map_data
-    call LoadScreen
+    call LoadPicture
 
     ld a, STATE_TITLE
     ldh (<state), a
-    ld a, $80
+    ld a, 128
     ldh (R_SCY), a	    ; reset screen for scroll
 
     ld a, %10010011         ; setup screen
@@ -266,9 +269,9 @@ TitleSetup:
     ei
 
     ; Title Animation
--   ld a, 3
+-   ld a, 2
     call WaitFrames
-    call ReadInput	    ; check if we need to skip it.
+    call ReadInput	    ; check if player hit joypad for skip
     ldh a, (<joypadDiff)
     and $FF
     jr nz, @skipanimation
@@ -280,6 +283,17 @@ TitleSetup:
 @skipanimation
     xor a
     ldh (R_SCY), a
+    ld a, 20
+    call WaitFrames
+
+    ; draw title font
+    ld b, 20
+    ld c, 8
+    ld de, _MAP0+(8*32)
+    ld hl, title_map_data+(20*8)
+    call LoadPicture
+
+    ; wait a lil bit
     ld a, 20
     call WaitFrames
 

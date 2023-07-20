@@ -32,6 +32,7 @@
     mapbuffer	DS 20*256           ; 20 x 256 tiles
     rowdrawsrc	DW		    ; source address for row to draw
     rowdrawdst	DW		    ; dest. address for row to draw
+    ldpicw      DB                  ; LoadPicture width byte
 .ENDS
 
 

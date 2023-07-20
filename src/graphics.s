@@ -67,6 +67,35 @@ LoadScreen:
     jr nz, --
     ret
 
+LoadPicture:
+    ; loads picture into vram that is b by c
+    ; b     width of picture
+    ; c     height of picture
+    ; hl    map source
+    ; de    destination in VRAM
+
+    ld a, b                 ; store b for later
+    ld (ldpicw), a
+--  ld a, (ldpicw)
+    ld b, a
+-   ldi a, (hl)
+    ld (de), a
+    inc de
+    dec b
+    jr nz, -
+    ld a, (ldpicw)          ; add (32-b) to destination for next line
+    cpl
+    inc a
+    add 32
+    add e
+    ld e, a
+    ld a, 0
+    adc d
+    ld d, a
+    dec c
+    jr nz, --
+    ret
+
 ; tiles for empty space
 .DEFINE EMPTY_TL    $09
 .DEFINE EMPTY_TR    $0A

@@ -11,7 +11,7 @@ Ideas
 - intro sequence of player starting the descent
 - lives?
 - title screen
-    - title slide in or appear?
+    - clouds floating around mountain top
 
 Fix
 ===
