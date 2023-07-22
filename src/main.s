@@ -42,18 +42,7 @@ MoveData:
     dec bc
     ld a, b
     or c
-    jp nz, -
-    ret
-
-ScreenOn:
-    ldh a, (R_LCDC)
-    or %01000000
-    ldh (R_LCDC), a
-    ret
-
-ScreenOff:
-    ld a, 0
-    ldh (R_LCDC), a
+    jr nz, -
     ret
 
 ScreenFadeOut:
@@ -101,7 +90,7 @@ WaitFrames:
 -   halt
     nop
     dec a
-    jp nz, -
+    jr nz, -
     ret
 
 ReadInput:
@@ -141,7 +130,7 @@ RandByte:
     ; gives a random byte in a
     ld a, (seed)
     sla a
-    jp nc, +
+    jr nc, +
     xor %00011101
 +   ld (seed), a
     ret

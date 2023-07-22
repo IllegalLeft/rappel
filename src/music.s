@@ -54,7 +54,7 @@ LoadWaveform:
     ld (de), a
     inc de
     dec c
-    jp nz, -
+    jr nz, -
     ret
 
 LoadMusic:
@@ -97,7 +97,7 @@ LoadMusic:
     inc c
     ld a, MusicChannels
     cp c
-    jp nz, -
+    jr nz, -
 
     ; zero timers
     xor a
@@ -175,7 +175,7 @@ UpdateMusic:
     dec de
 -   dec de
     dec a
-    jp nz, -
+    jr nz, -
     ld a, e
     ldi (hl), a
     ld a, d
@@ -227,7 +227,7 @@ UpdateMusic:
     ld d, a
     and $F0
     cp $70
-    jp nz, @checkTimer
+    jr nz, @checkTimer
 
     ; it's a rest
     ld a, d
@@ -248,7 +248,7 @@ UpdateMusic:
     add hl, bc
     ld a, (hl)			; is there a counter?
     cp $00
-    jp z, @note
+    jr z, @note
     dec a			; lower counter
     ld (hl), a
     jp @nextChannel		; and skip this music update
@@ -280,23 +280,23 @@ UpdateMusic:
     and $F0			; just octave
     swap a
 -   cp $00
-    jp z, +
+    jr z, +
     sra b
     rr e
     dec a
-    jp -
+    jr -
 
 +
     ; handle note based on channel number
     ld a, $00
     cp c
-    jp z, @handleCh0
+    jr z, @handleCh0
     ld a, $01
     cp c
-    jp z, @handleCh1
+    jr z, @handleCh1
     ld a, $02
     cp c
-    jp z, @handleCh2
+    jr z, @handleCh2
     jp @end			; if no handler, ignore it
 
 @handleCh0:
