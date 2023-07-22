@@ -21,7 +21,7 @@
     velx    db              ; absolute value
 .ENDST
 
-.RAMSECTION "Misc Vars" BANK 0 SLOT 2
+.RAMSECTION "Misc Vars" BANK 0 SLOT 3
     OAM		INSTANCEOF OAMentry 40
     seed	DB
     highscore	DW		    ; single highest score

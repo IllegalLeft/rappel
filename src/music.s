@@ -16,7 +16,7 @@
 ; WRAM DEFINITIONS
 ;==============================================================================
 
-.RAMSECTION "MusicVars" BANK 0 SLOT 2 ; Internal WRAM
+.RAMSECTION "MusicVars" BANK 0 SLOT 3 ; Internal WRAM
     MusicTicks:		db
     MusicTickLimit:	db
     MusicPointer:	dsw 4
