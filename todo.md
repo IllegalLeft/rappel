@@ -19,5 +19,4 @@ Fix
 - swinging offset
     - pos
     - speed?
-- first rung of rope doesn't move
 - dying on left side bug

@@ -541,15 +541,17 @@ DrawMapRow:
 
 MoveRope:
     ; moves the rope sprites to where they should connect to the player
-    ; note: top point is (80, 8)
+    ; note: point where rope is "attatched" to is (80,-40)
 
     ; calculate slope
+    ; start with x...
     ld a, (player.x)
-    cp 72
+    cp 72               ; are we swinging to the right or left?
     jr c, +
 
     ; swinging to the right
     sub 72
+    srl a
     srl a
     srl a
     ld d, a
@@ -560,40 +562,71 @@ MoveRope:
     sub d
     srl a
     srl a
+    srl a
     ld d, a
 ++
 
+    ; ...then the y
     ld a, (player.y)
+    add 40              ; pretend player y is much lower for attatched point
+    srl a
     srl a
     srl a
     ld e, a
 
-    ld b, 76+8		; for rope start pos. & oam x pos. offset
-    ld c, 8+16		; for rope start pos. & oam y pos. offset
-    ld hl, OAM.5
-.REPEAT 4
+    ld b, 76+8          ; for rope start pos. & oam x pos. offset
+    ld c, -40+16        ; for rope start pos. & oam y pos. offset
+    ld hl, OAM.5        ; first obj for rope
+
+    ; skip through first 4 rope rungs as we only need the lower 4
     ld a, c
-    ldi (hl), a
+    add e
+    add e
+    add e
     add e
     ld c, a
 
     ld a, (player.x)
-    cp 72
+    cp 72               ; swinging to left or right?
+    jr c, +
+    ld a, b             ; swinging to right
+    add d
+    add d
+    add d
+    add d
+    jr ++
++   ld a, b             ; swinging to left
+    sub d
+    sub d
+    sub d
+    sub d
+++
+    ld b, a
+
+    ; setup 4 rope rung objects
+.REPEAT 4
+    ld a, c
+    ldi (hl), a         ; set y pos
+    add e
+    ld c, a
+
+    ld a, (player.x)
+    cp 72               ; are we swinging to the left or right?
     jr c, +
 
     ld a, b
-    ldi (hl), a
+    ldi (hl), a         ; set x pos, (swinging right)
     add d
     ld b, a
     jr ++
 
 +   ld a, b
-    ldi (hl), a
+    ldi (hl), a         ; set x pos, (swinging left)
     sub d
     ld b, a
 
-++  inc hl
-    inc hl
+++  inc hl              ; skip tile index
+    inc hl              ; skip attr flags
 .ENDR
 
     ret
