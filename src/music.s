@@ -326,6 +326,8 @@ UpdateMusic:
     jr @end
 
 @handleCh2:
+    xor a
+    ldh (R_NR30), a
     ld a, %10000000
     ldh (R_NR30), a
     ld a, (MusicVoices + 4)
