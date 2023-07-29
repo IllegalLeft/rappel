@@ -144,9 +144,6 @@ UpdateMusic:
     jr @checkRest
 
 @tempoCmd:
-    ld hl, MusicPointer		; load MusicPointer
-    add hl, bc			; x2 since 2 bytes long
-    add hl, bc
     ldi a, (hl)
     ld e, a
     ldd a, (hl)			; decrement to go back for when storing again
@@ -171,14 +168,6 @@ UpdateMusic:
     jp @readSongData
 
 @ChVoiceCmd:			; edit the channel's MusicVoice data
-    ; load music pointer and increment it
-    ld hl, MusicPointer
-    add hl, bc			; x2 since 2byte len for pointer
-    add hl, bc
-    ldi a, (hl)
-    ld e, a
-    ldd a, (hl)
-    ld d, a
     inc de
     ld a, (de)			; load argument
     push de			; store MusicPointer value for later

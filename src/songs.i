@@ -87,7 +87,7 @@ Wave_SoftRamp:
     .DB $70 | COUNT
 .ENDM
 
-.MACRO tempo NARGS 1
+.MACRO tempo
     .DB MUSCMD_TEMPO, \1
 .ENDM
 
