@@ -74,9 +74,9 @@ LoadMusic:
     add a		    ; 2 bytes for instruments/voices
     add c
     ld c, a
-    jr nc, +
-    inc b		    ; carry just in case
-+   ld a, (bc)
+    ld a, 0
+    adc b
+    ld a, (bc)
     ld (de), a
     inc bc
     inc de
@@ -102,10 +102,9 @@ LoadMusic:
     ; zero timers
     xor a
     ld hl, MusicTimers
+.REPEAT MusicChannels
     ldi (hl), a
-    ldi (hl), a
-    ldi (hl), a
-    ldi (hl), a
+.ENDR
     ret
 
 UpdateMusic:
@@ -129,18 +128,18 @@ UpdateMusic:
     add hl, bc
     ldi a, (hl)			; lower byte of music pointer
     ld e, a
-    ld a, (hl)			; upper byte of music pointer
+    ldd a, (hl)			; upper byte of music pointer
     ld d, a
     ld a, (de)			; get next music byte
 
     ; Check for various commands and special cases
-    cp $00			; if the next byte $00...
-    jp z, @nextChannel		; ...means score is done
-    cp $F0
+    cp MUSCMD_END                ; if the next byte $00...
+    jp z, @nextChannel          ; ...means score is done
+    cp MUSCMD_TEMPO
     jr z, @tempoCmd
-    cp $F1
+    cp MUSCMD_LOOP
     jr z, @loopCmd
-    cp $F2
+    cp MUSCMD_VOICE
     jr z, @ChVoiceCmd
     jr @checkRest
 
@@ -163,23 +162,12 @@ UpdateMusic:
     jp @readSongData
 
 @loopCmd:			; ...loop back by moving the pointer
-    ld hl, MusicPointer		; load MusicPointer
-    add hl, bc			; channel offset
-    add hl, bc
-    ldi a, (hl)
-    ld e, a
-    ldd a, (hl)			; decrement to go back for when storing again
-    ld d, a
     inc de
-    ld a, (de)			; load loop argument
-    dec de
--   dec de
-    dec a
-    jr nz, -
-    ld a, e
+    ld a, (de)                  ; get next music byte (loop addr low)
     ldi (hl), a
-    ld a, d
-    ld (hl), a
+    inc de
+    ld a, (de)                  ; get next music byte (loop addr high)
+    ldd (hl), a
     jp @readSongData
 
 @ChVoiceCmd:			; edit the channel's MusicVoice data
@@ -204,9 +192,9 @@ UpdateMusic:
     ld de, MusicVoices
     ld a, c
     add e
-    jr nc, +			; handle carry to d
-    inc d
-+   ld e, a
+    ld a, 0
+    adc d                       ; handle carry to d
+    ld e, a
     ldi a, (hl)			; move instrument to destination (2 bytes)
     ld (de), a
     inc de

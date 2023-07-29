@@ -44,14 +44,21 @@ Wave_SoftRamp:
 .SECTION "Music"
 ; Music format:
 ; $00 = end of song
-; $YX = note Y in octave X
+; $XY = note Y in octave X
 ;	notes $1-C, octaves $0-$6
 ; $7X = rest for X counts
-; $FX = commands followed by operand bytes
+; $FX = commands followed by operand byte(s)
 ;	$0 = tempo
 ;	$1 = loop
 ;	$2 = change instrument/voice
 
+; Music Commands
+.DEFINE MUSCMD_END      $00
+.DEFINE MUSCMD_TEMPO    $F0
+.DEFINE MUSCMD_LOOP     $F1
+.DEFINE MUSCMD_VOICE    $F2
+
+; Note Definitions
 .DEFINE C_      $01
 .DEFINE C+      $02
 .DEFINE Db      $02
@@ -81,19 +88,20 @@ Wave_SoftRamp:
 .ENDM
 
 .MACRO tempo NARGS 1
-    .DB $F0, \1
+    .DB MUSCMD_TEMPO, \1
 .ENDM
 
-.MACRO loop ARGS COUNT
-    .DB $F1, COUNT
+.MACRO loop ARGS ADDR
+    .DB MUSCMD_LOOP
+    .DW ADDR
 .ENDM
 
 .MACRO changevoice ARGS VOICE
-    .DB $F2, VOICE
+    .DB MUSCMD_VOICE, VOICE
 .ENDM
 
 .MACRO songend
-    .DB $00
+    .DB MUSCMD_END
 .ENDM
 
 
@@ -121,14 +129,14 @@ Song_RapelCh2:
     note G_, 2
     note C+, 2
     rest 1
-    loop 13
+    loop Song_RapelCh2
     songend
 Song_RapelCh3:
     .DB $01,$71,$01,$71
     .DB $02,$01,$02,$01
     .DB $01,$71,$01,$71
     .DB $02,$01,$02,$01
-    loop 16
+    loop Song_RapelCh3
     songend
 
 Song_RapelRedux:
@@ -162,7 +170,7 @@ Song_RapelReduxCh0:
     rest 3
     note G+, 2
     rest 3
-    loop 13*3 + 8
+    loop Song_RapelReduxCh0
 Song_RapelReduxCh1:
     songend
 Song_RapelReduxCh2:
@@ -183,14 +191,14 @@ Song_RapelReduxCh2:
 .ENDR
     rest 8
     rest 8
-    loop 13*3 + 2
+    loop Song_RapelReduxCh2
     songend
 Song_RapelReduxCh3:
     .DB $01,$71,$01,$71
     .DB $02,$01,$02,$01
     .DB $01,$71,$01,$71
     .DB $02,$01,$02,$01
-    loop 16
+    loop Song_RapelReduxCh3
     songend
 
 .ENDS
