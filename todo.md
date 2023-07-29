@@ -8,10 +8,13 @@ Ideas
 - music
     - death
     - pause, unpause
+- music engine
+    - sfx channels
 - intro sequence of player starting the descent
 - lives?
 - title screen
     - clouds floating around mountain top
+- better, continuous rope (a la a certain frog fighting game)
 
 Fix
 ===
@@ -19,4 +22,3 @@ Fix
 - swinging offset
     - pos
     - speed?
-- dying on left side bug

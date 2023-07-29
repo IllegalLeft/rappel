@@ -141,7 +141,11 @@ SlowPlayerVel:
 SetPlayerY:
     ; set player's y based off of the arc data
     ld a, (player.x)
-    ld b, a
+    ; check for out of bounds values
+    cp 160
+    jr c,+
+    xor a
++   ld b, a
     ld hl, ArcData
     add l
     ld l, a
