@@ -248,7 +248,7 @@ TitleSetup:
 
     ld a, %10000000	    ; sound on
     ldh (R_NR52), a
-    ld a, %00100010	    ; volume
+    ld a, %01000100	    ; volume
     ldh (R_NR50), a
     ld a, $FF		    ; enable all channels to both L&R
     ldh (R_NR51), a
@@ -436,7 +436,7 @@ SetupGame:
     ; turn on sound
     ld a, %10000000	    ; sound on
     ldh (R_NR52), a
-    ld a, %00100010	    ; volume
+    ld a, %01000100	    ; volume
     ldh (R_NR50), a
     ld a, $FF		    ; enable all channels to both L&R
     ldh (R_NR51), a

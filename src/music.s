@@ -16,15 +16,16 @@
 ; WRAM DEFINITIONS
 ;==============================================================================
 
+.DEFINE NUM_MUSIC_CHANS     4   ; total number of virtual music channels
+
 .RAMSECTION "MusicVars" BANK 0 SLOT 3 ; Internal WRAM
     MusicTicks:		db
     MusicTickLimit:	db
-    MusicPointer:	dsw 4
-    MusicTimers:	ds  4
+    MusicPointer:	dsw NUM_MUSIC_CHANS
+    MusicTimers:	ds  NUM_MUSIC_CHANS
+    MusicOctaves:       ds  NUM_MUSIC_CHANS
     MusicVoices:	dsw 3
 .ENDS
-
-.DEF MusicChannels  4	    ; total number of music channels
 
 ;==============================================================================
 ; SUBROUTINES
@@ -95,14 +96,21 @@ LoadMusic:
     ld (de), a
     inc de
     inc c
-    ld a, MusicChannels
+    ld a, NUM_MUSIC_CHANS
     cp c
     jr nz, -
 
     ; zero timers
     xor a
     ld hl, MusicTimers
-.REPEAT MusicChannels
+.REPEAT NUM_MUSIC_CHANS
+    ldi (hl), a
+.ENDR
+
+    ; reset octaves
+    ld a, 3
+    ld hl, MusicOctaves
+.REPEAT NUM_MUSIC_CHANS
     ldi (hl), a
 .ENDR
     ret
@@ -141,7 +149,15 @@ UpdateMusic:
     jr z, @loopCmd
     cp MUSCMD_VOICE
     jr z, @ChVoiceCmd
-    jr @checkRest
+
+    ; some single byte cmds we need to check for
+    ld d, a
+    and $F0
+    cp MUSCMD_REST
+    jr z, @restCmd
+    cp MUSCMD_OCTAVE
+    jr z, @octaveCmd
+    jr @checkTimer              ; check timers before handling like a note
 
 @tempoCmd:
     ldi a, (hl)
@@ -200,12 +216,41 @@ UpdateMusic:
     ld (hl), a			; store it back
     jp @readSongData
 
+@octaveCmd:
+    ld a, d
+    and $0F
+    ld b, a
+    ld de, MusicOctaves
+    ld a, c
+    add e
+    ld e, a
+    ld a, 0
+    adc d
+    ld d, a
+    ld a, b
+    ld (de), a                  ; store new octave
+    ld b, 0
+    ld hl, MusicPointer         ; we need to increment music pointer
+    add hl, bc
+    add hl, bc
+    ldi a, (hl)
+    ld e, a
+    ld a, (hl)
+    ld d, a
+    inc de
+    ld a, d
+    ldd (hl), a
+    ld a, e
+    ld (hl), a
+    jp @readSongData
+
 @checkRest:
     ld d, a
     and $F0
     cp $70
     jr nz, @checkTimer
 
+@restCmd:
     ; it's a rest
     ld a, d
     and $0F
@@ -233,11 +278,12 @@ UpdateMusic:
 @note:
     ld a, $03			; will skip freq if noise channel
     cp c
-    jr z, @handleCh3
+    jp z, @handleCh3
 
     ld a, d
     ; it's note
-    and $0F			; just note
+    and $F0			; just note
+    swap a
 
     dec a			; entry 0 in LUT is C
     add a			; pitch LUT is 2 bytes per entry
@@ -253,17 +299,35 @@ UpdateMusic:
     ld b, a
 
     ; divide to get octave
-    ld a, d
-    and $F0			; just octave
-    swap a
+    ld hl, MusicOctaves
+    ld a, c
+    add l
+    ld l, a
+    ld a, 0
+    adc h
+    ld h, a
+    ld a, (hl)                  ; retrieve the octave
 -   cp $00
     jr z, +
     sra b
     rr e
     dec a
     jr -
-
 +
+
+    ; store delay for note
+    ld hl, MusicTimers
+    ld a, c
+    add l
+    ld l, a
+    ld a, 0
+    adc h
+    ld h, a
+    ld a, d
+    and $0F
+    ld (hl), a
+
+
     ; handle note based on channel number
     ld a, $00
     cp c
@@ -351,7 +415,7 @@ UpdateMusic:
 
 @nextChannel:
     inc c
-    ld a, MusicChannels
+    ld a, NUM_MUSIC_CHANS
     cp c			; done with all channels?
     jp nz, @readSongData
     ret

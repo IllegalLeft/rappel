@@ -22,3 +22,4 @@ Fix
 - swinging offset
     - pos
     - speed?
+- pausing can cause changes in momentum

@@ -43,48 +43,55 @@ Wave_SoftRamp:
 
 .SECTION "Music"
 ; Music format:
-; $00 = end of song
-; $XY = note Y in octave X
-;	notes $1-C, octaves $0-$6
-; $7X = rest for X counts
+; $0X = octave X, $0-6
+; $XY = note X for Y ticks
+;       notes $1-$C, ticks $1-$F
+; $EX = rest for X counts
 ; $FX = commands followed by operand byte(s)
 ;	$0 = tempo
-;	$1 = loop
+;	$1 = loop, followed by addr to jump to
 ;	$2 = change instrument/voice
+; $FF = end of song
 
 ; Music Commands
-.DEFINE MUSCMD_END      $00
+.DEFINE MUSCMD_OCTAVE   $00
+.DEFINE MUSCMD_REST     $E0
 .DEFINE MUSCMD_TEMPO    $F0
 .DEFINE MUSCMD_LOOP     $F1
 .DEFINE MUSCMD_VOICE    $F2
+.DEFINE MUSCMD_END      $FF
 
 ; Note Definitions
-.DEFINE C_      $01
-.DEFINE C+      $02
-.DEFINE Db      $02
-.DEFINE D_      $03
-.DEFINE D+      $04
-.DEFINE Eb      $04
-.DEFINE E_      $05
-.DEFINE F_      $06
-.DEFINE F+      $07
-.DEFINE Gb      $07
-.DEFINE G_      $08
-.DEFINE G+      $09
-.DEFINE Ab      $09
-.DEFINE A_      $0A
-.DEFINE A+      $0B
-.DEFINE Bb      $0B
-.DEFINE B_      $0C
+.DEFINE C_      $1
+.DEFINE C+      $2
+.DEFINE Db      $2
+.DEFINE D_      $3
+.DEFINE D+      $4
+.DEFINE Eb      $4
+.DEFINE E_      $5
+.DEFINE F_      $6
+.DEFINE F+      $7
+.DEFINE Gb      $7
+.DEFINE G_      $8
+.DEFINE G+      $9
+.DEFINE Ab      $9
+.DEFINE A_      $A
+.DEFINE A+      $B
+.DEFINE Bb      $B
+.DEFINE B_      $C
 
 
 ; Music Macros
-.MACRO note ARGS PITCH, OCTAVE
-    .DB (OCTAVE << 4) | PITCH
+.MACRO octave
+    .DB MUSCMD_OCTAVE | \1
 .ENDM
 
-.MACRO rest ARGS COUNT
-    .DB $70 | COUNT
+.MACRO note ARGS PITCH, LENGTH
+    .DB (PITCH << 4) | LENGTH
+.ENDM
+
+.MACRO rest
+    .DB MUSCMD_REST | \1
 .ENDM
 
 .MACRO tempo
@@ -116,19 +123,14 @@ Song_RapelCh0:
 Song_RapelCh1:
     songend
 Song_RapelCh2:
-    note C_, 2
-    rest 1
-    note C_, 2
-    rest 1
-    note D+, 2
-    rest 1
-    note C+, 2
-    rest 1
-    note C_, 2
-    rest 4
-    note G_, 2
-    note C+, 2
-    rest 1
+    octave 2
+    note C_, 1
+    note C_, 1
+    note D+, 1
+    note C+, 1
+    note C_, 4
+    note G_, 0
+    note C+, 1
     loop Song_RapelCh2
     songend
 Song_RapelCh3:
@@ -148,52 +150,95 @@ Song_RapelRedux:
     .DW Song_RapelReduxCh3
 Song_RapelReduxCh0:
 .REPEAT 3
-    note C_, 3
-    rest 1
+    octave 3
+    note C_, 1
     note F_, 3
-    rest 3
-    note C_, 3
-    rest 1
-    note D+, 3
-    rest 1
-    note G_, 2
-    note A+, 2
-    rest 1
-    note D_, 3
-    rest 2
+    note C_, 1
+    note D+, 1
+    octave 2
+    note G_, 0
+    note A+, 1
+    octave 3
+    note D_, 2
 .ENDR
-    note C_, 3
-    rest 5
-    note C_, 3
-    rest 1
+    note C_, 5
+    note C_, 1
     note D+, 3
-    rest 3
-    note G+, 2
-    rest 3
+    octave 2
+    note G+, 3
     loop Song_RapelReduxCh0
 Song_RapelReduxCh1:
     songend
 Song_RapelReduxCh2:
 .REPEAT 3
-    note C_, 2
-    rest 1
-    note C_, 2
-    rest 1
-    note D+, 2
-    rest 1
-    note C+, 2
-    rest 1
-    note C_, 2
-    rest 4
-    note G_, 2
-    note C+, 2
-    rest 1
+    octave 2
+    note C_, 1
+    note C_, 1
+    note D+, 1
+    note C+, 1
+    note C_, 4
+    note G_, 0
+    note C+, 1
 .ENDR
     rest 8
     rest 8
     loop Song_RapelReduxCh2
     songend
 Song_RapelReduxCh3:
+    .DB $01,$71,$01,$71
+    .DB $02,$01,$02,$01
+    .DB $01,$71,$01,$71
+    .DB $02,$01,$02,$01
+    loop Song_RapelReduxCh3
+    songend
+
+
+Song_RapelDX:
+    .DB $0C                     ; tempo
+    .DB $00, $00, $01           ; voices
+    .DW Song_RapelDXCh0         ; channel scores
+    .DW Song_RapelDXCh1
+    .DW Song_RapelDXCh2
+    .DW Song_RapelDXCh3
+Song_RapelDXCh0:
+    octave 3
+.REPEAT 3
+    note C_, 1
+    note F_, 3
+    note C_, 1
+    note D+, 1
+    octave 2
+    note G_, 0
+    note A+, 1
+    octave 3
+    note D_, 2
+.ENDR
+    note C_, 5
+    note C_, 1
+    note D+, 3
+    octave 2
+    note G+, 3
+    loop Song_RapelDXCh0
+    songend
+Song_RapelDXCh1:
+    songend
+Song_RapelDXCh2:
+.REPEAT 3
+    octave 2
+    note C_, 1
+    note C_, 1
+    note D+, 1
+    note C+, 1
+    note C_, 4
+    note G_, 0
+    note C+, 1
+.ENDR
+    rest 8
+    rest 8
+    loop Song_RapelReduxCh2
+    songend
+    songend
+Song_RapelDXCh3:
     .DB $01,$71,$01,$71
     .DB $02,$01,$02,$01
     .DB $01,$71,$01,$71
