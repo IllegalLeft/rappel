@@ -9,8 +9,7 @@
 
 .INCLUDE "gb_hardware.i"
 .INCLUDE "header.i"
-
-.INCLUDE "songs.i"
+.INCLUDE "music.i"
 
 ;==============================================================================
 ; WRAM DEFINITIONS
@@ -25,6 +24,26 @@
     MusicTimers:	ds  NUM_MUSIC_CHANS
     MusicOctaves:       ds  NUM_MUSIC_CHANS
     MusicVoices:	dsw 3
+.ENDS
+
+;==============================================================================
+; AUDIO CONSTANTS
+;==============================================================================
+
+.SECTION "AudioConstants" FREE
+Pitches:
+.DW $F82C   ; C	    1
+.DW $F89D   ; C#    2
+.DW $F907   ; D	    3
+.DW $F96B   ; D#    4
+.DW $F9CA   ; E	    5
+.DW $FA23   ; F	    6
+.DW $FA77   ; F#    7
+.DW $FAC7   ; G	    8
+.DW $FB12   ; G#    9
+.DW $FB58   ; A	    a
+.DW $FB9B   ; A#    b
+.DW $FBDA   ; B	    c
 .ENDS
 
 ;==============================================================================
@@ -420,22 +439,6 @@ UpdateMusic:
     jp nz, @readSongData
     ret
 
-.ENDS
-
-.SECTION "AudioConstants" FREE
-Pitches:
-.DW $F82C   ; C	    1
-.DW $F89D   ; C#    2
-.DW $F907   ; D	    3
-.DW $F96B   ; D#    4
-.DW $F9CA   ; E	    5
-.DW $FA23   ; F	    6
-.DW $FA77   ; F#    7
-.DW $FAC7   ; G	    8
-.DW $FB12   ; G#    9
-.DW $FB58   ; A	    a
-.DW $FB9B   ; A#    b
-.DW $FBDA   ; B	    c
 .ENDS
 
 ; vim: filetype=wla

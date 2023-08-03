@@ -10,6 +10,10 @@ Ideas
     - pause, unpause
 - music engine
     - sfx channels
+    - new command bytes
+        - panning
+        - volume
+        - duty cycle
 - intro sequence of player starting the descent
 - lives?
 - title screen

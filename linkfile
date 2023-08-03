@@ -5,6 +5,7 @@ graphics.o
 interrupts.o
 level.o
 music.o
+songs.o
 strings.o
 
 [libraries]
