@@ -31,7 +31,7 @@ HiHat:		; 5
 
 Instruments:
 Inst1:
-.DB $84, $F2
+.DB $84, $F1
 Inst2:
 .DB $07, $40
 Inst3:
@@ -86,22 +86,18 @@ Song_RapelCh2:
     loop Song_RapelCh2
     songend
 Song_RapelCh3:
-    ;.DB $01,$71,$01,$71
     sample 1
     rest 1
     sample 1
     rest 1
-    ;.DB $02,$01,$02,$01
     sample 2
     sample 1
     sample 2
     sample 1
-    ;.DB $01,$71,$01,$71
     sample 1
     rest 1
     sample 1
     rest 1
-    ;.DB $02,$01,$02,$01
     sample 2
     sample 1
     sample 2

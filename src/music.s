@@ -17,13 +17,15 @@
 
 .DEFINE NUM_MUSIC_CHANS     4   ; total number of virtual music channels
 
-.RAMSECTION "MusicVars" BANK 0 SLOT 3 ; Internal WRAM
+.RAMSECTION "MusicVars" BANK 0 SLOT 3   ; Internal WRAM
     MusicTicks:		db
     MusicTickLimit:	db
     MusicPointer:	dsw NUM_MUSIC_CHANS
     MusicTimers:	ds  NUM_MUSIC_CHANS
     MusicOctaves:       ds  NUM_MUSIC_CHANS
     MusicVoices:	dsw 3
+
+    SFXCurrent:         db              ; SFX currently playing on channels
 .ENDS
 
 ;==============================================================================
@@ -295,8 +297,8 @@ UpdateMusic:
     jp @nextChannel		; and skip this music update
 
 @note:
-    ld a, $03			; will skip freq if noise channel
-    cp c
+    ld a, c			; will skip freq if noise channel
+    cp CHAN_NOISE
     jp z, @handleCh3
 
     ld a, d
@@ -348,18 +350,21 @@ UpdateMusic:
 
 
     ; handle note based on channel number
-    ld a, $00
-    cp c
+    ld a, c
+    cp CHAN_PULSE1
     jr z, @handleCh0
-    ld a, $01
-    cp c
+    cp CHAN_PULSE2
     jr z, @handleCh1
-    ld a, $02
-    cp c
+    cp CHAN_WAVE
     jr z, @handleCh2
+
     jp @end			; if no handler, ignore it
 
 @handleCh0:
+    ld a, (SFXCurrent)        ; check if sfx are being played on this channel
+    bit CHAN_PULSE1, a
+    jr nz, @end
+
     ld a, (MusicVoices + 0)
     ldh (R_NR11), a
     ld a, (MusicVoices + 1)
@@ -373,6 +378,10 @@ UpdateMusic:
     jr @end
 
 @handleCh1:
+    ld a, (SFXCurrent)        ; check if sfx are being played on this channel
+    bit CHAN_PULSE2, a
+    jr nz, @end
+
     ld a, (MusicVoices + 2)
     ldh (R_NR21), a
     ld a, (MusicVoices + 3)
@@ -386,6 +395,10 @@ UpdateMusic:
     jr @end
 
 @handleCh2:
+    ld a, (SFXCurrent)        ; check if sfx are being played on this channel
+    bit CHAN_WAVE, a
+    jr nz, @end
+
     xor a
     ldh (R_NR30), a
     ld a, %10000000
@@ -403,6 +416,10 @@ UpdateMusic:
     jr @end
 
 @handleCh3:
+    ld a, (SFXCurrent)        ; check if sfx are being played on this channel
+    bit CHAN_NOISE, a
+    jr nz, @end
+
     ld hl, NoiseSamples
     ld e, d
     ld d, 0
