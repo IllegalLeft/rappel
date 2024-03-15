@@ -5,3 +5,6 @@
 
 # Editing files
 *.swp
+
+# vscode
+.vscode
