@@ -200,7 +200,7 @@ Start:
     ld hl, highscore	    ; blank highscore
     ldi (hl), a
     ld (hl), a
-    jr TitleSetup
+    jr Title
 
 
 SoftReset:
@@ -224,94 +224,8 @@ SoftReset:
     ld bc, $BFF
     call BlankData
 
-TitleSetup:
-    ; load title tiles
-    ld hl, title_tile_data
-    ld de, _VRAM
-    ld bc, title_tile_data_size
-    call MoveData
-
-    ; draw title mountain
-    ld b, 20
-    ld c, 8
-    ld de, _MAP0
-    ld hl, title_map_data
-    call LoadPicture
-
-    ld a, STATE_TITLE
-    ldh (<state), a
-    ld a, 128
-    ldh (R_SCY), a	    ; reset screen for scroll
-
-    ld a, %10010011         ; setup screen
-    ldh (R_LCDC), a
-
-    ld a, %10000000	    ; sound on
-    ldh (R_NR52), a
-    ld a, %01000100	    ; volume
-    ldh (R_NR50), a
-    ld a, $FF		    ; enable all channels to both L&R
-    ldh (R_NR51), a
-
-    ld a, $01
-    ldh (R_IE), a           ; enable only vblank interrupt
-    ei
-
-    ; Title Animation
--   ld a, 2
-    call WaitFrames
-    call ReadInput	    ; check if player hit joypad for skip
-    ldh a, (<joypadDiff)
-    and $FF
-    jr nz, @skipanimation
-    ldh a, (R_SCY)
-    inc a
-    inc a
-    ldh (R_SCY), a
-    jr nz, -
-@skipanimation
-    xor a
-    ldh (R_SCY), a
-    ld a, 20
-    call WaitFrames
-
-    ; draw title font
-    ld b, 20
-    ld c, 8
-    ld de, _MAP0+(8*32)
-    ld hl, title_map_data+(20*8)
-    call LoadPicture
-
-    ; wait a lil bit
-    ld a, 20
-    call WaitFrames
-
-    ; print strings
-    ld hl, Str_Author
-    ld de, $9A03
-    call PrintStr
-    ld hl, Str_Date
-    ld de, $9A28
-    call PrintStr
-    halt
-    nop
-    ld hl, Str_Highscore
-    ld de, $9803
-    call PrintStr
-    ld a, (highscore+1)
-    ld de, $980D
-    call PrintInt
-    ld a, (highscore)
-    inc de
-    call PrintInt
-    ld hl, Str_PressStart
-    ld de, $99A4
-    call PrintStr
-
-    ld hl, Song_RapelRedux
-    call LoadMusic
-    ld hl, Wave_Tri
-    call LoadWaveform
+Title:
+    call TitleSetup
 
 TitleLoop:
     halt
@@ -320,131 +234,16 @@ TitleLoop:
     call HandleTitleInput
     call UpdateMusic
 
+    ldh a, (<ticks)
+    and $07
+    jr nz, +
+    call MoveCloud
++
     ldh a, (<state)
     cp STATE_TITLE
     jr z, TitleLoop
 
-
-SetupGame:
-    call ScreenFadeOut
-    ; turn off screen
-    xor a
-    ldh (R_LCDC), a
-
-    ; halt music and load new music in
-    call StopMusic
-    ld hl, Song_Rapel
-    call LoadMusic
-
-    ; clear tilemap
-    xor a
-    ld hl, _MAP0
-    ld bc, $A33
-    call BlankData
-
-    ; load tiles
-    ld hl, Tiles
-    ld de, _VRAM
-    ld bc, (tiles_sprites_size+1)
-    call MoveData
-
-    ldh a, (R_DIV)	    ; get a random seed from the DIV timer register
-    ld (seed), a
-
-    call InitMapBuffer
-    call GenerateLevel
-
-    ; load in visible map
-    ld hl, mapbuffer
-    ld de, _MAP0
-    ld b, 25		    ; lines to do
---  ld c, SCREEN_W/8	    ; individual tiles on row
--   ldi a, (hl)
-    ld (de), a
-    inc de
-    dec c
-    jr nz, -
-    ld a, $20-$14	    ; offset to next row in map
-    add e
-    ld e, a
-    ld a, 0
-    adc d
-    ld d, a
-    dec b
-    jr nz, --
-
-    ; set up player
-    xor a
-    ld b, 1
-    call ObjInit
-    xor a
-    ld b, 20
-    ld c, 20
-    call ObjMove
-
-    ld a, (SCREEN_W/2)-8    ; place player in center
-    ld (player.x), a
-    call SetPlayerY
-
-    ; set up rope sprites
-    ld hl, OAM.5
-.REPEAT 4
-    ld a, 20
-    ldi (hl), a
-    ld a, (SCREEN_W/2)-4
-    ldi (hl), a
-    ld a, TILE_ROPE
-    ldi (hl), a
-    xor a
-    ldi (hl), a
-.ENDR
-
-    call MoveRope
-
-    xor a
-    ld (player.velx), a	    ; blank velx
-    ld hl, score	    ; blank score
-    ldi (hl), a
-    ldi (hl), a
-    ldi (hl), a		    ; blank depth
-    ld (hl), a
-
-
-    ; setup scorebar
-    ld hl, Str_Hi
-    ld de, $9C01
-    call PrintStr
-    ld a, (highscore+1)
-    ld de, $9C04
-    call PrintInt
-    ld a, (highscore)
-    inc de
-    call PrintInt
-    ld hl, Str_Sc
-    ld de, $9C0C
-    call PrintStr
-
-
-    ld a, %00000011         ; LCD STAT & VBlank interrupt
-    ldh (R_IE), a
-    ; setup scorebar interrupt
-    ld a, %01000000	    ; enable LYC=LY STAT interrupt
-    ldh (R_STAT), a
-    ld a, 8                 ; set LYC
-    ldh (R_LYC), a
-
-    ; turn on sound
-    ld a, %10000000	    ; sound on
-    ldh (R_NR52), a
-    ld a, %01000100	    ; volume
-    ldh (R_NR50), a
-    ld a, $FF		    ; enable all channels to both L&R
-    ldh (R_NR51), a
-
-    ; turn on screen
-    ld a, %10011011
-    ldh (R_LCDC), a
-    call ScreenFadeIn
+    call SetupGame
 
 MainGameLoop:
     ; score bar

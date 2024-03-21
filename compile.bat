@@ -7,6 +7,7 @@ wla-gb level.s
 wla-gb music.s
 wla-gb songs.s
 wla-gb strings.s
+wla-gb title.s
 wlalink -S ..\linkfile rappel.gb
 move rappel.gb ..
 move rappel.sym ..
