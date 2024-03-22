@@ -18,15 +18,15 @@
 .SECTION "Instruments & Samples" FREE
 
 NoiseSamples:
-Kick:		; 1
+Kick:       ; 1
 .DB $81, $56
-Snare:		; 2
+Snare:      ; 2
 .DB $82, $51
-HiHat2:		; 3
+HiHat2:     ; 3
 .DB $81, $00
-HiHat2Open:	; 4
+HiHat2Open: ; 4
 .DB $82, $00
-HiHat:		; 5
+HiHat:      ; 5
 .DB $42, $14
 
 Instruments:

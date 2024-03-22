@@ -57,7 +57,7 @@ VBlankHandler:
     call DMARoutine
 
     ld hl, ticks
-    inc (hl)			; increment ticks
+    inc (hl)        ; increment ticks
 
     ; draw row if needed
     ld a, (rowdrawsrc+1)

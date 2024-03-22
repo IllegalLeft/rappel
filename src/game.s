@@ -31,7 +31,7 @@ SetupGame:
     ld bc, (tiles_sprites_size+1)
     call MoveData
 
-    ldh a, (R_DIV)	    ; get a random seed from the DIV timer register
+    ldh a, (R_DIV)      ; get a random seed from the DIV timer register
     ld (seed), a
 
     call InitMapBuffer
@@ -40,14 +40,14 @@ SetupGame:
     ; load in visible map
     ld hl, mapbuffer
     ld de, _MAP0
-    ld b, 25		    ; lines to do
---  ld c, SCREEN_W/8	    ; individual tiles on row
+    ld b, 25            ; lines to do
+--  ld c, SCREEN_W/8    ; individual tiles on row
 -   ldi a, (hl)
     ld (de), a
     inc de
     dec c
     jr nz, -
-    ld a, $20-$14	    ; offset to next row in map
+    ld a, $20-$14       ; offset to next row in map
     add e
     ld e, a
     ld a, 0
@@ -85,11 +85,11 @@ SetupGame:
     call MoveRope
 
     xor a
-    ld (player.velx), a	    ; blank velx
-    ld hl, score	    ; blank score
+    ld (player.velx), a ; blank velx
+    ld hl, score        ; blank score
     ldi (hl), a
     ldi (hl), a
-    ldi (hl), a		    ; blank depth
+    ldi (hl), a         ; blank depth
     ld (hl), a
 
 
@@ -108,20 +108,20 @@ SetupGame:
     call PrintStr
 
 
-    ld a, %00000011         ; LCD STAT & VBlank interrupt
+    ld a, %00000011     ; LCD STAT & VBlank interrupt
     ldh (R_IE), a
     ; setup scorebar interrupt
-    ld a, %01000000	    ; enable LYC=LY STAT interrupt
+    ld a, %01000000     ; enable LYC=LY STAT interrupt
     ldh (R_STAT), a
-    ld a, 8                 ; set LYC
+    ld a, 8             ; set LYC
     ldh (R_LYC), a
 
     ; turn on sound
-    ld a, %10000000	    ; sound on
+    ld a, %10000000     ; sound on
     ldh (R_NR52), a
-    ld a, %01000100	    ; volume
+    ld a, %01000100     ; volume
     ldh (R_NR50), a
-    ld a, $FF		    ; enable all channels to both L&R
+    ld a, $FF           ; enable all channels to both L&R
     ldh (R_NR51), a
 
     ; turn on screen
@@ -133,13 +133,13 @@ SetupGame:
 HandleGameInput:
     ; Key Down
     ldh a, (<joypadDiff)
-    ld b, a		    ; store for later
+    ld b, a             ; store for later
     and JOY_START
     jr z, @checkright
     ; Start
     ld a, STATE_PAUSE
     ldh (<state), a
-    ret			    ; no need to do anything else, game is paused
+    ret                 ; no need to do anything else, game is paused
 @checkright:
     ld a, b
     and JOY_RIGHT
@@ -165,34 +165,34 @@ HandleGameInput:
     ; B
     ld a, (player.velx)
     ld c, a
-    cp 0		    ; test if 0 already
+    cp 0            ; test if 0 already
     jr nz, +
     jr ++
 +   bit 7, a
     jr z, +
-    inc a		    ; - velocities need to be increased
+    inc a           ; - velocities need to be increased
     jr ++
-+   dec a		    ; + velocities need to be decreased
++   dec a           ; + velocities need to be decreased
 ++  ld (player.velx), a
 @handledkeydowns:
 
     ; Key Held
     ldh a, (<joypadNew)
-    ;ld b, a		    ; store for later keypad checks
+    ;ld b, a         ; store for later keypad checks
     and JOY_DOWN
     jr z, @handledkeyhelds
     ld a, (depth)
-    ld b, a		    ; store for later score increment check
+    ld b, a         ; store for later score increment check
     add 1
-    ld c, a		    ; store for later score increment check
+    ld c, a         ; store for later score increment check
     ld (depth), a
     jr nc, +
-    ld a, (depth+1)	    ; increase high byte if carry
+    ld a, (depth+1) ; increase high byte if carry
     inc a
     ld (depth+1), a
 +
     ld a, b
-    xor c		    ; only increment score if bit 4 changed
+    xor c           ; only increment score if bit 4 changed
     and 16
     jr z, @noincscore
     ; increment score
@@ -201,7 +201,7 @@ HandleGameInput:
     daa
     ld (score), a
     jr nc, +
-    ld a, (score+1)	    ; handle carry
+    ld a, (score+1) ; handle carry
     add 1
     daa
     ld (score+1), a
@@ -216,19 +216,19 @@ HandleGameInput:
 ApplyVelX:
     ld a, (player.velx)
     ld b, a
-    bit 7, a		    ; is it negative?
+    bit 7, a        ; is it negative?
     jr z, @movingright
     ; moving left
-    ld a, b		    ; need to negate 2's compl velx
-    cpl			    ; it's negative and we don't need it like that
-    inc a		    ; to be subtracted from the x ord.
+    ld a, b         ; need to negate 2's compl velx
+    cpl             ; it's negative and we don't need it like that
+    inc a           ; to be subtracted from the x ord.
     ld b, a
     ld a, (player.x)
     sub b
     ld (player.x), a
     jr @applyvxend
-@movingright:		    ; or even stationary (vel = 0)
-                            ; no need to negate 2's compl. velx here
+@movingright:       ; or even stationary (vel = 0)
+                    ; no need to negate 2's compl. velx here
     ld a, (player.x)
     add b
     ld (player.x), a
@@ -292,10 +292,10 @@ CheckCollision:
     cp -4
     jr nc, +
     ccf
-    ret				    ; collision
+    ret     ; collision
 +
     ; TODO: fix for 256 long mapbuffer
-    ;ret	; remove this when fixing
+    ;ret    ; remove this when fixing
 
     ; check collision with tiles
     ld a, (player.y)
@@ -305,14 +305,14 @@ CheckCollision:
     add 4
     call FindMapBuffTile
 
-    ldi a, (hl)			    ; top left tile
+    ldi a, (hl)     ; top left tile
     cp $0D
     ret nc
-    ld a, (hl)			    ; top right tile
+    ld a, (hl)      ; top right tile
     cp $0D
     ret nc
-    ld a, $14-1			    ; bottom left tile is $14 to new line
-    add l			    ; then -1 to put it back one
+    ld a, $14-1     ; bottom left tile is $14 to new line
+    add l           ; then -1 to put it back one
     ld l, a
     ld a, 0
     adc h
@@ -351,11 +351,11 @@ CheckCollision:
     ; otherwise, continue
 
 
-    ld a, (hl)			    ; bottom left tile
+    ld a, (hl)      ; bottom left tile
     cp $0D
     ret nc
     inc hl
-    ld a, (hl)			    ; bottom right tile
+    ld a, (hl)      ; bottom right tile
     cp $0D
     ret nc
 
@@ -371,17 +371,17 @@ UpdateHighscore:
     ; update highscore if score is greater than current highcore
     ld hl, highscore+1
     ld a, (score+1)
-    cp (hl)		    ; compare the upper byte first
-    jr z, @hscorelower	    ; if the upper byte is equal to...
-    jr nc, @hscoreupdate    ; if upper byte is greater than...
-    jr @nohscoreupdate	    ; no need to check as upper byte is lower
+    cp (hl)             ; compare the upper byte first
+    jr z, @hscorelower  ; if the upper byte is equal to...
+    jr nc, @hscoreupdate; if upper byte is greater than...
+    jr @nohscoreupdate  ; no need to check as upper byte is lower
 @hscorelower:
-    dec hl		    ; check lower byte
+    dec hl              ; check lower byte
     ld a, (score)
     cp (hl)
     jr c, @nohscoreupdate   ; if lower bute is less than
 
-@hscoreupdate:		    ; new highscore!
+@hscoreupdate:          ; new highscore!
     ld hl, highscore
     ld a, (score)
     ldi (hl), a

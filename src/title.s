@@ -62,16 +62,16 @@ TitleSetup:
     ld a, STATE_TITLE
     ldh (<state), a
     ld a, 128
-    ldh (R_SCY), a	    ; reset screen for scroll
+    ldh (R_SCY), a          ; reset screen for scroll
 
     ld a, %10010011         ; setup screen
     ldh (R_LCDC), a
 
-    ld a, %10000000	    ; sound on
+    ld a, %10000000         ; sound on
     ldh (R_NR52), a
-    ld a, %01000100	    ; volume
+    ld a, %01000100         ; volume
     ldh (R_NR50), a
-    ld a, $FF		    ; enable all channels to both L&R
+    ld a, $FF               ; enable all channels to both L&R
     ldh (R_NR51), a
 
     ld a, $01
@@ -81,7 +81,7 @@ TitleSetup:
     ; Title Animation
 -   ld a, 2
     call WaitFrames
-    call ReadInput	    ; check if player hit joypad for skip
+    call ReadInput          ; check if player hit joypad for skip
     ldh a, (<joypadDiff)
     and $FF
     jr nz, @skipanimation

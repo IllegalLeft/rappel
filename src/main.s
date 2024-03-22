@@ -94,27 +94,27 @@ WaitFrames:
     ret
 
 ReadInput:
-    ld a, (joypadNew)	    ; move old keypad state
+    ld a, (joypadNew)   ; move old keypad state
     ld (joypadOld), a
 
-    ld a, $20		    ; select P14
+    ld a, $20           ; select P14
     ld (_IO), a
-    ld a, (_IO)	    ; read pad
-    ld a, (_IO)	    ; a bunch of times
-    cpl			    ; active low so flip 'er
-    and $0f		    ; only need last 4 bits
+    ld a, (_IO)         ; read pad
+    ld a, (_IO)         ; a bunch of times
+    cpl                 ; active low so flip 'er
+    and $0f             ; only need last 4 bits
     swap a
     ld b, a
     ld a, $10
-    ld (_IO), a	    ; select P15
+    ld (_IO), a         ; select P15
     ld a, (_IO)
     ld a, (_IO)
     cpl
-    and $0F		    ; only need last 4 bits
-    or b		    ; put a and b together
-    ld (joypadNew), a	    ; store into 0page for later
+    and $0F             ; only need last 4 bits
+    or b                ; put a and b together
+    ld (joypadNew), a   ; store into 0page for later
 
-    ld b, a		    ; find difference in two keystates
+    ld b, a             ; find difference in two keystates
     ld a, (joypadOld)
     xor b
     ld b, a
@@ -122,7 +122,7 @@ ReadInput:
     and b
     ld (joypadDiff), a
 
-    ld a, $30		    ; reset joypad
+    ld a, $30           ; reset joypad
     ld (_IO), a
     ret
 
@@ -144,7 +144,7 @@ HandleTitleInput:
     and JOY_START
     jr z, @done
     ld a, STATE_GAME
-    ldh (<state), a	    ; start the game
+    ldh (<state), a     ; start the game
 @done:
     ret
 
@@ -176,12 +176,12 @@ Start:
     call BlankData          ; blank VRAM
     ld hl, _HRAM
     ld bc, $FFFE-$FF80
-    call BlankData	    ; blank HRAM
+    call BlankData          ; blank HRAM
 
     ; load palette
-    ld a, %11100100	    ; bg
+    ld a, %11100100         ; bg
     ldh (R_BGP), a
-    ld a, %11100100	    ; obj
+    ld a, %11100100         ; obj
     ldh (R_OBP0), a
 
     ; setup DMA routine
@@ -197,7 +197,7 @@ Start:
     call MoveData
 
     xor a
-    ld hl, highscore	    ; blank highscore
+    ld hl, highscore        ; blank highscore
     ldi (hl), a
     ld (hl), a
     jr Title
@@ -205,9 +205,9 @@ Start:
 
 SoftReset:
     xor a
-    ldh (R_IE), a	    ; no need for any interrupts
-    ldh (R_NR52), a	    ; no need for sound either
--   ld a, (LY)		    ; wait vblank
+    ldh (R_IE), a       ; no need for any interrupts
+    ldh (R_NR52), a     ; no need for sound either
+-   ld a, (LY)          ; wait vblank
     cp $91
     jr nz, -
     ldh a, (R_LCDC)
@@ -247,16 +247,16 @@ TitleLoop:
 
 MainGameLoop:
     ; score bar
-    xor a		    ; clear screen y for score bar
+    xor a               ; clear screen y for score bar
     ldh (R_SCY), a
-    halt                    ; wait for score bar to end
+    halt                ; wait for score bar to end
     nop
 
     ; main game view
-    ld a, (depth)	    ; low byte of depth is the screen y ordinate
+    ld a, (depth)       ; low byte of depth is the screen y ordinate
     ldh (R_SCY), a
     ldh a, (R_LCDC)
-    xor %00001000	    ; switch map address
+    xor %00001000       ; switch map address
     ldh (R_LCDC), a
 
     call ReadInput
@@ -269,7 +269,7 @@ MainGameLoop:
     nop
 
     ldh a, (R_LCDC)
-    xor %00001000	    ; swap to scorebar map
+    xor %00001000       ; swap to scorebar map
     ldh (R_LCDC), a
 
     ldh a, (<state)
@@ -277,13 +277,13 @@ MainGameLoop:
     jp z, PauseSetup
 
 GameLogic:
-    ldh a, (<ticks)	    ; only need to apply x vel every so many frames
+    ldh a, (<ticks)     ; only need to apply x vel every so many frames
     and $01
     jr nz, @noapplyvelx
     call ApplyVelX
 @noapplyvelx:
 
-    ldh a, (<ticks)	    ; only need to slow player vel every so many frames
+    ldh a, (<ticks)     ; only need to slow player vel every so many frames
     and $03
     jr nz, @noslow
     call SlowPlayerVel
@@ -291,11 +291,11 @@ GameLogic:
 
     call SetPlayerY
     call CheckCollision
-    jp nc, GameoverSetup    ; gameover if side collision
+    jp nc, GameoverSetup; gameover if side collision
 
     call MoveRope
 
-    xor a		    ; clear carry flag for when using daa with scorebar
+    xor a               ; clear carry flag for when using daa with scorebar
     ; update scorebar
     ld a, (score+1)
     ld de, $9C0F
@@ -311,10 +311,10 @@ PauseSetup:
     call StopMusic
 
     ; load pause tiles
-    ld hl, OAM.33	    ; starting OAM address
-    ld de, Str_Paused	    ; start of text
-    ld b, $50		    ; y ordinate
-    ld c, $40		    ; starting x ordinate
+    ld hl, OAM.33       ; starting OAM address
+    ld de, Str_Paused   ; start of text
+    ld b, $50           ; y ordinate
+    ld c, $40           ; starting x ordinate
 
 .REPEAT 6
     ld a, b
@@ -326,13 +326,13 @@ PauseSetup:
     ld a, (de)
     ldi (hl), a
     inc de
-    inc hl		    ; no flags
+    inc hl              ; no flags
 .ENDR
 
     ; blank out rope sprites by setting Y OAM byte to 0
     xor a
     ld hl, OAM.5
-    ld bc, 4		    ; 4 OAM entries * 4 bytes
+    ld bc, 4            ; 4 OAM entries * 4 bytes
     ld d, a
 -   ldi (hl), a
     inc hl
@@ -346,16 +346,16 @@ PauseSetup:
 
 PauseLoop:
     ; score bar
-    xor a		    ; clear screen y for score bar
+    xor a               ; clear screen y for score bar
     ldh (R_SCY), a
-    halt                    ; wait for score bar to end
+    halt                ; wait for score bar to end
     nop
 
     ; main game view
-    ld a, (depth)	    ; low byte of depth is the screen y ordinate
+    ld a, (depth)       ; low byte of depth is the screen y ordinate
     ldh (R_SCY), a
     ldh a, (R_LCDC)
-    xor %00001000	    ; switch map address
+    xor %00001000       ; switch map address
     ldh (R_LCDC), a
 
     call ReadInput
@@ -365,22 +365,22 @@ PauseLoop:
     nop
 
     ldh a, (R_LCDC)
-    xor %00001000	    ; swap to scorebar map
+    xor %00001000       ; swap to scorebar map
     ldh (R_LCDC), a
 
     ; check if unpaused
     ldh a, (<joypadDiff)
     and JOY_START
-    jr z, PauseLoop	    ; pause loop if not unpaused
-    ld a, STATE_GAME	    ; set state to playing
+    jr z, PauseLoop     ; pause loop if not unpaused
+    ld a, STATE_GAME    ; set state to playing
     ldh (<state), a
 
     xor a
     ld hl, OAM.33
-    ld bc, 8*4		    ; 8 OAM entries * 4 bytes
-    call BlankData	    ; remove sprites for paused text
+    ld bc, 8*4          ; 8 OAM entries * 4 bytes
+    call BlankData      ; remove sprites for paused text
 
-    jp MainGameLoop	    ; then resume main gameplay loop
+    jp MainGameLoop     ; then resume main gameplay loop
 
 
 GameoverSetup:
@@ -391,10 +391,10 @@ GameoverSetup:
     call StopMusic
 
     ; load gameover tiles
-    ld hl, OAM.33	    ; starting OAM address
-    ld de, Str_GameOver	    ; start of text
-    ld b, $50		    ; y ordinate
-    ld c, $35		    ; starting x ordinate
+    ld hl, OAM.33       ; starting OAM address
+    ld de, Str_GameOver ; start of text
+    ld b, $50           ; y ordinate
+    ld c, $35           ; starting x ordinate
 
 .REPEAT 3
     ld a, b
@@ -406,7 +406,7 @@ GameoverSetup:
     ld a, (de)
     ldi (hl), a
     inc de
-    inc hl		    ; no flags
+    inc hl              ; no flags
 .ENDR
     ld a, b
     ldi (hl), a
@@ -417,7 +417,7 @@ GameoverSetup:
     ld a, (de)
     ldi (hl), a
     inc de
-    inc hl		    ; no flags
+    inc hl              ; no flags
 .REPEAT 4
     ld a, b
     ldi (hl), a
@@ -428,12 +428,12 @@ GameoverSetup:
     ld a, (de)
     ldi (hl), a
     inc de
-    inc hl		    ; no flags
+    inc hl              ; no flags
 .ENDR
 
 Gameover:
     ; score bar
-    xor a		    ; clear screen y for score bar
+    xor a               ; clear screen y for score bar
     ldh (R_SCY), a
 
     ; wait for score bar to end
@@ -441,10 +441,10 @@ Gameover:
     nop
 
     ; main game view
-    ld a, (depth)	    ; low byte of depth is the screen y ordinate
+    ld a, (depth)       ; low byte of depth is the screen y ordinate
     ldh (R_SCY), a
     ldh a, (R_LCDC)
-    xor %00001000	    ; switch map address
+    xor %00001000       ; switch map address
     ldh (R_LCDC), a
 
     call ReadInput
@@ -458,7 +458,7 @@ Gameover:
     nop
 
     ldh a, (R_LCDC)
-    xor %00001000	    ; swap to scorebar map
+    xor %00001000       ; swap to scorebar map
     ldh (R_LCDC), a
 
     jr Gameover

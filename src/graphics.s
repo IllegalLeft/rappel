@@ -12,7 +12,7 @@
 DMARoutineOriginal:
     ld a, >OAMBuffer
     ldh (R_DMA), a
-    ld a, $28			; 5x40 cycles, approx. 200ms
+    ld a, $28       ; 5x40 cycles, approx. 200ms
 -   dec a
     jr nz, -
     ret
@@ -27,7 +27,7 @@ PrintStr:
     ld (de), a
     inc de
     jr -
-    ret				; just in case
+    ret     ; just in case
 
 .DEFINE numberOffset	    $6B
 PrintInt:
@@ -74,7 +74,7 @@ LoadPicture:
     ; hl    map source
     ; de    destination in VRAM
 
-    ld a, b                 ; store b for later
+    ld a, b         ; store b for later
     ld (ldpicw), a
 --  ld a, (ldpicw)
     ld b, a
@@ -83,7 +83,7 @@ LoadPicture:
     inc de
     dec b
     jr nz, -
-    ld a, (ldpicw)          ; add (32-b) to destination for next line
+    ld a, (ldpicw)  ; add (32-b) to destination for next line
     cpl
     inc a
     add 32
@@ -133,7 +133,7 @@ ObjInit:
     ; zeros out an object x and y (hiding it) and sets it's tile id
     ; a	    obj index num
     ; b	    tile id
-    ld c, 4			; 4 tiles
+    ld c, 4         ; 4 tiles
     ld hl, OAM.1
     sla a
     sla a
@@ -143,7 +143,7 @@ ObjInit:
     ld l, a
     ld a, 0
     adc h
-    ld h, a			; hl is the tile address
+    ld h, a         ; hl is the tile address
 -   xor a
     ldi (hl), a
     ldi (hl), a
@@ -170,9 +170,9 @@ ObjMove:
     ld l, a
     ld a, 0
     adc h
-    ld h, a			    ; hl is now the address of the tile
+    ld h, a             ; hl is now the address of the tile
 
-    ld a, 8			    ; handle gameboy's sprite offsets
+    ld a, 8             ; handle gameboy's sprite offsets
     add b
     ld b, a
     ld a, 16
@@ -180,31 +180,31 @@ ObjMove:
     ld c, a
 
     ld a, c
-    ldi (hl), a			    ; top right tile, y
+    ldi (hl), a         ; top right tile, y
     ld a, b
-    ldi (hl), a			    ; top right tile x
+    ldi (hl), a         ; top right tile x
     ld a, c
     inc hl
     inc hl
-    ldi (hl), a			    ; top left tile y
+    ldi (hl), a         ; top left tile y
     ld a, 8
     add a, b
-    ldi (hl), a			    ; top left tile x
+    ldi (hl), a         ; top left tile x
     inc hl
     inc hl
     ld a, 8
     add a, c
-    ldi (hl), a			    ; bottom right tile y
+    ldi (hl), a         ; bottom right tile y
     ld a, b
-    ldi (hl), a			    ; bottom right tile x
+    ldi (hl), a         ; bottom right tile x
     inc hl
     inc hl
     ld a, 8
     add a, c
-    ldi (hl), a			    ; bottom left tile y
+    ldi (hl), a         ; bottom left tile y
     ld a, 8
     add a, b
-    ldi (hl), a			    ; bottom right tile x
+    ldi (hl), a         ; bottom right tile x
     ret
 
 ObjTile:
@@ -220,7 +220,7 @@ ObjTile:
     ld l, a
     ld a, 0
     adc h
-    ld h, a			    ; hl is now the address of the tile
+    ld h, a             ; hl is now the address of the tile
 .REPEAT 4
     ld a, b
     ld (hl), a
@@ -241,7 +241,7 @@ PlaceCliff:
     ;
     ; get random tile spot
     call RandByte
-    and $0F	    		    ; 10 tiles available so limit it to 0-9
+    and $0F             ; 10 tiles available so limit it to 0-9
     cp 10
     jr c, +
     sub 9
@@ -250,14 +250,14 @@ PlaceCliff:
 
     ; find tile address
     ldh a, (R_SCY)
-    add 16+144			    ; find bottom of screen + a row
-    and $F0			    ; a / 16
+    add 16+144          ; find bottom of screen + a row
+    and $F0             ; a / 16
     swap a
-    ld de, _MAP0		    ; base address for tiles
+    ld de, _MAP0        ; base address for tiles
     cp 0
     jr z, +
     ld c, a
--   ld a, $40			    ; bytes to next row
+-   ld a, $40           ; bytes to next row
     add e
     ld e, a
     ld a, 0
@@ -266,7 +266,7 @@ PlaceCliff:
     dec c
     jr nz, -
 +
-    ld a, b			    ; add in random offset
+    ld a, b             ; add in random offset
     add e
     ld e, a
     ld a, 0
@@ -300,10 +300,10 @@ PlaceCliff:
 ClearRow:
     ; fills a single row with empty map tiles
     ldh a, (R_SCY)
-    sub $10			    ; should do the row above the current toprow
-    and $F0			    ; a / 16
-    swap a			    ; a/16
-    ld hl, _MAP0		    ; base address for tilemap
+    sub $10             ; should do the row above the current toprow
+    and $F0             ; a / 16
+    swap a              ; a/16
+    ld hl, _MAP0        ; base address for tilemap
     cp 0
     jr z, +
     ld c, a
@@ -325,7 +325,7 @@ ClearRow:
     ldi (hl), a
     dec c
     jr nz, -
-    ld a, $0C			    ; move hl to next line
+    ld a, $0C           ; move hl to next line
     add l
     ld l, a
     ld a, 0
@@ -344,25 +344,25 @@ ClearRow:
 
 FindMapTile:
     ; Finds the map tile at a given x and y in VRAM
-    ; a	    x
-    ; b	    y
+    ; a     x
+    ; b     y
     ; Returns:
     ; hl    tile address
 
     ; figure out tile x and y
-    srl a			    ; figure out x tile ordinate
+    srl a               ; figure out x tile ordinate
     srl a
     srl a
     ld d, a
-    ldh a, (R_SCY)		    ; figure out y tile ordinate
+    ldh a, (R_SCY)      ; figure out y tile ordinate
     add b
     srl a
     srl a
     srl a
-    and $1F			    ; can only be tile 0-31
+    and $1F             ; can only be tile 0-31
 
     ; find address
-    ld hl, _MAP0		    ; base address of map
+    ld hl, _MAP0        ; base address of map
     ld c, a
     cp $00
     jr z, +
@@ -375,7 +375,7 @@ FindMapTile:
     dec c
     jr nz, -
 +
-    ld a, d			    ; lets add the x offset now
+    ld a, d             ; lets add the x offset now
     add l
     ld l, a
     ld a, 0
@@ -385,11 +385,11 @@ FindMapTile:
 
 MapCoords:
     ; finds map coordinates for x and y
-    ; a	    point x
-    ; b	    point y
+    ; a     point x
+    ; b     point y
     ; returns:
-    ; a	    tile x
-    ; y	    tile y
+    ; a     tile x
+    ; y     tile y
     srl a
     srl a
     srl a
@@ -399,24 +399,24 @@ MapCoords:
     srl a
     srl a
     srl a
-    and $1F			    ; can only be tile 0-31
+    and $1F             ; can only be tile 0-31
     ld b, a
     ld a, c
     ret
 
 FindMapBuffTile:
     ; Finds the map tile at a given x and y
-    ; a	    x
-    ; b	    y
+    ; a     x
+    ; b     y
     ; Returns:
     ; hl    tile address
 
     ; figure out tile x and y
-    srl a			    ; figure out x tile ordinate
+    srl a               ; figure out x tile ordinate
     srl a
     srl a
     ld c, a
-    ld a, (depth+1)		    ; figure out y tile ordinate
+    ld a, (depth+1)     ; figure out y tile ordinate
     ld d, a
     ld a, (depth)
     add b
@@ -445,8 +445,8 @@ FindMapBuffTile:
     rl d
     add hl, de
 
-    ld b, 0			    ; c already is xord
-    add hl, bc			    ; add x offset
+    ld b, 0             ; c already is xord
+    add hl, bc          ; add x offset
     ret
 
 PrepareMapRow:
@@ -462,9 +462,9 @@ PrepareMapRow:
 .ENDR
     add 18
     cp 0
-    jr z, +			    ; if first row is 0 no need to add anything
+    jr z, +             ; if first row is 0 no need to add anything
     ld c, a
--   ld a, 20			    ; mapbuffer row len
+-   ld a, 20            ; mapbuffer row len
     add l
     ld l, a
     ld a, 0
@@ -488,8 +488,8 @@ PrepareMapRow:
     ld c, a
     ld hl, _MAP0
     cp 0
-    jr z, +			    ; if first row is 0, no need to add anything
--   ld a, $20			    ; VRAM map row len
+    jr z, +             ; if first row is 0, no need to add anything
+-   ld a, $20           ; VRAM map row len
     add l
     ld l, a
     ld a, 0
@@ -661,11 +661,11 @@ Tiles:
 .DB $48,$B8,$E8,$18,$E0,$90,$B0,$50,$F1,$10,$C1,$00,$43,$00,$27,$00
 .DB $00,$00,$18,$3C,$3C,$66,$66,$42,$66,$42,$3C,$66,$18,$3C,$00,$00
 
-.DEFINE TILE_ROPE	    $11
+.DEFINE TILE_ROPE       $11
 .EXPORT TILE_ROPE
 
 ; font
-.DEFINE tiles_font_size	    37 * 16
+.DEFINE tiles_font_size 37 * 16
 .EXPORT tiles_font_size
 tiles_font:
 .DB $00,$00,$18,$18,$3C,$3C,$66,$66,$7E,$7E,$66,$66,$66,$66,$00,$00

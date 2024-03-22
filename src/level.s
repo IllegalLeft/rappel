@@ -7,8 +7,8 @@
 
 PlaceObstacle:
     ; Places a cliff in the map buffer at a certain x and y.
-    ; a	    x ordinate
-    ; b	    y ordinate
+    ; a     x ordinate
+    ; b     y ordinate
 
     ld hl, mapbuffer
     ; add 20*y offset
@@ -49,16 +49,16 @@ PlaceObstacle:
 
 
 GenerateLevel:
-    ; generates a level with some randomly placed clifs
+    ; generates a level with some randomly placed cliffs
     ld c, 50
--   call RandByte                   ; get a random y ordinate
-    and %11111110		    ; cliff can only be on even numbered rows
+-   call RandByte           ; get a random y ordinate
+    and %11111110           ; cliff can only be on even numbered rows
     ld b, a
-    call RandByte                   ; get a random x ordinate
-    and %00011110		    ; cliff can only be even numbered columns
-    cp 20                           ; is it over 20? (mapbuff width)
+    call RandByte           ; get a random x ordinate
+    and %00011110           ; cliff can only be even numbered columns
+    cp 20                   ; is it over 20? (mapbuff width)
     jr c, +
-    jr -                            ; pick a new number
+    jr -                    ; pick a new number
 +
     push bc
     call PlaceObstacle
