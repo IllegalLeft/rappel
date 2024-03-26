@@ -50,7 +50,7 @@ PlaceObstacle:
 
 GenerateLevel:
     ; generates a level with some randomly placed cliffs
-    ld c, 50
+    ld c, 30
 -   call RandByte           ; get a random y ordinate
     and %11111110           ; cliff can only be on even numbered rows
     ld b, a

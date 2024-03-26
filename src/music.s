@@ -15,15 +15,15 @@
 ; WRAM DEFINITIONS
 ;==============================================================================
 
-.DEFINE NUM_MUSIC_CHANS     4   ; total number of virtual music channels
+.DEFINE NUM_MUSIC_CHANS     4           ; total number of virtual music channels
 
 .RAMSECTION "MusicVars" BANK 0 SLOT 3   ; Internal WRAM
-    MusicTicks:		db
-    MusicTickLimit:	db
-    MusicPointer:	dsw NUM_MUSIC_CHANS
-    MusicTimers:	ds  NUM_MUSIC_CHANS
+    MusicTicks:         db
+    MusicTickLimit:     db
+    MusicPointer:       dsw NUM_MUSIC_CHANS
+    MusicTimers:        ds  NUM_MUSIC_CHANS
     MusicOctaves:       ds  NUM_MUSIC_CHANS
-    MusicVoices:	dsw 3
+    MusicVoices:        dsw 3
 
     SFXCurrent:         db              ; SFX currently playing on channels
 .ENDS
@@ -34,18 +34,18 @@
 
 .SECTION "AudioConstants" FREE
 Pitches:
-.DW $F82C   ; C	    1
+.DW $F82C   ; C     1
 .DW $F89D   ; C#    2
-.DW $F907   ; D	    3
+.DW $F907   ; D     3
 .DW $F96B   ; D#    4
-.DW $F9CA   ; E	    5
-.DW $FA23   ; F	    6
+.DW $F9CA   ; E     5
+.DW $FA23   ; F     6
 .DW $FA77   ; F#    7
-.DW $FAC7   ; G	    8
+.DW $FAC7   ; G     8
 .DW $FB12   ; G#    9
-.DW $FB58   ; A	    a
+.DW $FB58   ; A     a
 .DW $FB9B   ; A#    b
-.DW $FBDA   ; B	    c
+.DW $FBDA   ; B     c
 .ENDS
 
 ;==============================================================================
@@ -144,22 +144,22 @@ UpdateMusic:
     inc a
     cp b
     ld (MusicTicks), a
-    ret nz			; no update needed
-    xor a			; zero music counter, will do an update
+    ret nz          ; no update needed
+    xor a           ; zero music counter, will do an update
     ld (MusicTicks), a
 
-    ld c, 0			; start with channel 0
+    ld c, 0         ; start with channel 0
     ld b, 0
 @readSongData:
     ; load first song byte
     ld hl, MusicPointer
-    add hl, bc			; channel offset
+    add hl, bc          ; channel offset
     add hl, bc
-    ldi a, (hl)			; lower byte of music pointer
+    ldi a, (hl)         ; lower byte of music pointer
     ld e, a
-    ldd a, (hl)			; upper byte of music pointer
+    ldd a, (hl)         ; upper byte of music pointer
     ld d, a
-    ld a, (de)			; get next music byte
+    ld a, (de)          ; get next music byte
 
     ; Check for various commands and special cases
     cp MUSCMD_END                ; if the next byte $00...
@@ -183,19 +183,19 @@ UpdateMusic:
 @tempoCmd:
     ldi a, (hl)
     ld e, a
-    ldd a, (hl)			; decrement to go back for when storing again
+    ldd a, (hl)                 ; decrement to go back for when storing again
     ld d, a
     inc de
     ld a, (de)
     inc de
-    ld (MusicTickLimit), a		; set new frame ticks limit/tempo
+    ld (MusicTickLimit), a      ; set new frame ticks limit/tempo
     ld a, e
     ldi (hl), a
     ld a, d
     ld (hl), a
     jp @readSongData
 
-@loopCmd:			; ...loop back by moving the pointer
+@loopCmd:                       ; ...loop back by moving the pointer
     inc de
     ld a, (de)                  ; get next music byte (loop addr low)
     ldi (hl), a
@@ -204,10 +204,10 @@ UpdateMusic:
     ldd (hl), a
     jp @readSongData
 
-@ChVoiceCmd:			; edit the channel's MusicVoice data
+@ChVoiceCmd:                    ; edit the channel's MusicVoice data
     inc de
-    ld a, (de)			; load argument
-    push de			; store MusicPointer value for later
+    ld a, (de)                  ; load argument
+    push de                     ; store MusicPointer value for later
     ld e, a
     xor a
     ld d, a
@@ -221,20 +221,20 @@ UpdateMusic:
     ld a, 0
     adc d                       ; handle carry to d
     ld e, a
-    ldi a, (hl)			; move instrument to destination (2 bytes)
+    ldi a, (hl)                 ; move instrument to destination (2 bytes)
     ld (de), a
     inc de
     ld a, (hl)
     ld (de), a
-    pop de			; retrieve MusicPointer value
+    pop de                      ; retrieve MusicPointer value
     ld hl, MusicPointer
     add hl, bc
     add hl, bc
-    inc de			; advance it
+    inc de                      ; advance it
     ld a, e
     ldi (hl), a
     ld a, d
-    ld (hl), a			; store it back
+    ld (hl), a                  ; store it back
     jp @readSongData
 
 @octaveCmd:
@@ -279,42 +279,42 @@ UpdateMusic:
     ld d, a
 
     ld hl, MusicTimers
-    add hl, bc			; channel offset
-    ld a, (hl)			; pull current timer
+    add hl, bc          ; channel offset
+    ld a, (hl)          ; pull current timer
     add d
-    ld (hl), a			; set the timer
+    ld (hl), a          ; set the timer
     jp @end
 
 
 @checkTimer:
     ld hl, MusicTimers
     add hl, bc
-    ld a, (hl)			; is there a counter?
+    ld a, (hl)          ; is there a counter?
     cp $00
     jr z, @note
-    dec a			; lower counter
+    dec a               ; lower counter
     ld (hl), a
-    jp @nextChannel		; and skip this music update
+    jp @nextChannel     ; and skip this music update
 
 @note:
-    ld a, c			; will skip freq if noise channel
+    ld a, c             ; will skip freq if noise channel
     cp CHAN_NOISE
     jp z, @handleCh3
 
     ld a, d
     ; it's note
-    and $F0			; just note
+    and $F0             ; just note
     swap a
 
-    dec a			; entry 0 in LUT is C
-    add a			; pitch LUT is 2 bytes per entry
+    dec a               ; entry 0 in LUT is C
+    add a               ; pitch LUT is 2 bytes per entry
     ld hl, Pitches
     add l
     ld l, a
     ld a, 0
     adc h
     ld h, a
-    ldi a, (hl)			; get pitch value
+    ldi a, (hl)         ; get pitch value
     ld e, a
     ld a, (hl)
     ld b, a
@@ -358,10 +358,10 @@ UpdateMusic:
     cp CHAN_WAVE
     jr z, @handleCh2
 
-    jp @end			; if no handler, ignore it
+    jp @end                     ; if no handler, ignore it
 
 @handleCh0:
-    ld a, (SFXCurrent)        ; check if sfx are being played on this channel
+    ld a, (SFXCurrent)          ; check if sfx are being played on this channel
     bit CHAN_PULSE1, a
     jr nz, @end
 
@@ -371,14 +371,14 @@ UpdateMusic:
     ldh (R_NR12), a
     ld a, e
     ldh (R_NR13), a
-    ld a, %00000111		; high 3 bit freq mask
+    ld a, %00000111             ; high 3 bit freq mask
     and b
-    add %11000000		; high bits to restart sound
+    add %11000000               ; high bits to restart sound
     ldh (R_NR14), a
     jr @end
 
 @handleCh1:
-    ld a, (SFXCurrent)        ; check if sfx are being played on this channel
+    ld a, (SFXCurrent)          ; check if sfx are being played on this channel
     bit CHAN_PULSE2, a
     jr nz, @end
 
@@ -388,14 +388,14 @@ UpdateMusic:
     ldh (R_NR22), a
     ld a, e
     ldh (R_NR23), a
-    ld a, %00000111		; high 3 bit freq mask
+    ld a, %00000111             ; high 3 bit freq mask
     and b
-    add %11000000		; high bits to restart sound
+    add %11000000               ; high bits to restart sound
     ldh (R_NR24), a
     jr @end
 
 @handleCh2:
-    ld a, (SFXCurrent)        ; check if sfx are being played on this channel
+    ld a, (SFXCurrent)          ; check if sfx are being played on this channel
     bit CHAN_WAVE, a
     jr nz, @end
 
@@ -416,7 +416,7 @@ UpdateMusic:
     jr @end
 
 @handleCh3:
-    ld a, (SFXCurrent)        ; check if sfx are being played on this channel
+    ld a, (SFXCurrent)          ; check if sfx are being played on this channel
     bit CHAN_NOISE, a
     jr nz, @end
 
@@ -441,18 +441,18 @@ UpdateMusic:
     add hl, bc
     ldi a, (hl)
     ld e, a
-    ldd a, (hl)			; decrement hl for later storing music pointer
+    ldd a, (hl)                 ; decrement hl for later storing music pointer
     ld d, a
-    inc de			; increment music pointer
-    ld a, e			; lower byte
+    inc de                      ; increment music pointer
+    ld a, e                     ; lower byte
     ldi (hl), a
-    ld a, d			; upper byte
+    ld a, d                     ; upper byte
     ld (hl), a
 
 @nextChannel:
     inc c
     ld a, NUM_MUSIC_CHANS
-    cp c			; done with all channels?
+    cp c                        ; done with all channels?
     jp nz, @readSongData
     ret
 

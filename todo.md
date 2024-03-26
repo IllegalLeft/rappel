@@ -16,8 +16,6 @@ Ideas
         - duty cycle
 - intro sequence of player starting the descent
 - lives?
-- title screen
-    - clouds floating around mountain top
 - better, continuous rope (a la a certain frog fighting game)
 
 Fix
