@@ -162,7 +162,7 @@ UpdateMusic:
     ld a, (de)          ; get next music byte
 
     ; Check for various commands and special cases
-    cp MUSCMD_END                ; if the next byte $00...
+    cp MUSCMD_END               ; if the next byte $00...
     jp z, @nextChannel          ; ...means score is done
     cp MUSCMD_TEMPO
     jr z, @tempoCmd
@@ -279,42 +279,42 @@ UpdateMusic:
     ld d, a
 
     ld hl, MusicTimers
-    add hl, bc          ; channel offset
-    ld a, (hl)          ; pull current timer
+    add hl, bc                  ; channel offset
+    ld a, (hl)                  ; pull current timer
     add d
-    ld (hl), a          ; set the timer
+    ld (hl), a                  ; set the timer
     jp @end
 
 
 @checkTimer:
     ld hl, MusicTimers
     add hl, bc
-    ld a, (hl)          ; is there a counter?
+    ld a, (hl)                  ; is there a counter?
     cp $00
     jr z, @note
-    dec a               ; lower counter
+    dec a                       ; lower counter
     ld (hl), a
-    jp @nextChannel     ; and skip this music update
+    jp @nextChannel             ; and skip this music update
 
 @note:
-    ld a, c             ; will skip freq if noise channel
+    ld a, c                     ; will skip freq if noise channel
     cp CHAN_NOISE
     jp z, @handleCh3
 
     ld a, d
     ; it's note
-    and $F0             ; just note
+    and $F0                     ; just note
     swap a
 
-    dec a               ; entry 0 in LUT is C
-    add a               ; pitch LUT is 2 bytes per entry
+    dec a                       ; entry 0 in LUT is C
+    add a                       ; pitch LUT is 2 bytes per entry
     ld hl, Pitches
     add l
     ld l, a
     ld a, 0
     adc h
     ld h, a
-    ldi a, (hl)         ; get pitch value
+    ldi a, (hl)                 ; get pitch value
     ld e, a
     ld a, (hl)
     ld b, a

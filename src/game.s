@@ -19,11 +19,16 @@ SetupGame:
     ld hl, Song_Rapel
     call LoadMusic
 
-    ; clear tilemap
-    xor a
+    ; clear tilemaps
+    ld a, $FF
     ld hl, _MAP0
     ld bc, $A33
     call BlankData
+    ld a, $FF
+    ld hl, _MAP1
+    ld bc, $A33
+    call BlankData
+
 
     ; load tiles
     ld hl, Tiles
@@ -58,7 +63,7 @@ SetupGame:
 
     ; set up player
     xor a
-    ld b, 1
+    ld de, player_tilemap
     call ObjInit
     xor a
     ld b, 20
@@ -306,10 +311,10 @@ CheckCollision:
     call FindMapBuffTile
 
     ldi a, (hl)     ; top left tile
-    cp $0D
+    cp $0E
     ret nc
     ld a, (hl)      ; top right tile
-    cp $0D
+    cp $0E
     ret nc
     ld a, $14-1     ; bottom left tile is $14 to new line
     add l           ; then -1 to put it back one
@@ -352,11 +357,11 @@ CheckCollision:
 
 
     ld a, (hl)      ; bottom left tile
-    cp $0D
+    cp $0E
     ret nc
     inc hl
     ld a, (hl)      ; bottom right tile
-    cp $0D
+    cp $0E
     ret nc
 
     ; check collision with objects

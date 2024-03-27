@@ -44,12 +44,14 @@ TitleSetup:
     ld (cloud.y), a
     ld a, 1
     ld (cloud.velx), a
+
     ; cloud OAM init
     ld a, 0
-    ld b, $80
+    ld de, tilemap_cloud
     call ObjInit
+
     ld a, 1
-    ld b, $84
+    ld de, tilemap_cloud+4
     call ObjInit
 
     ; draw title mountain
