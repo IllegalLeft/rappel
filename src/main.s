@@ -191,9 +191,9 @@ Start:
     call MoveData
 
     ; load font tiles
-    ld hl, tiles_font
+    ld hl, FontTiles
     ld de, _VRAM+$500
-    ld bc, tiles_font_size
+    ld bc, _sizeof_FontTiles
     call MoveData
 
     xor a

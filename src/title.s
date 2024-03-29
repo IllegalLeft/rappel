@@ -26,15 +26,15 @@
 
 TitleSetup:
     ; load title tiles
-    ld hl, title_tile_data
+    ld hl, TitleTiles
     ld de, _VRAM
-    ld bc, title_tile_data_size
+    ld bc, _sizeof_TitleTiles
     call MoveData
 
     ; load cloud tiles
-    ld hl, tiles_cloud
+    ld hl, CloudTiles
     ld de, $8800
-    ld bc, tiles_cloud_size
+    ld bc, _sizeof_CloudTiles
     call MoveData
 
     ; cloud WRAM init
@@ -47,18 +47,18 @@ TitleSetup:
 
     ; cloud OAM init
     ld a, 0
-    ld de, tilemap_cloud
+    ld de, CloudTileMap
     call ObjInit
 
     ld a, 1
-    ld de, tilemap_cloud+4
+    ld de, CloudTileMap+4
     call ObjInit
 
     ; draw title mountain
     ld b, 20
     ld c, 8
     ld de, _MAP0
-    ld hl, title_map_data
+    ld hl, TitleTileMap
     call LoadPicture
 
     ld a, STATE_TITLE
@@ -102,7 +102,7 @@ TitleSetup:
     ld b, 20
     ld c, 8
     ld de, _MAP0+(8*32)
-    ld hl, title_map_data+(20*8)
+    ld hl, TitleTileMap+(20*8)
     call LoadPicture
 
     ; wait a lil bit

@@ -31,9 +31,9 @@ SetupGame:
 
 
     ; load tiles
-    ld hl, Tiles
+    ld hl, SpriteTiles
     ld de, _VRAM
-    ld bc, (tiles_sprites_size+1)
+    ld bc, (_sizeof_SpriteTiles+1)
     call MoveData
 
     ldh a, (R_DIV)      ; get a random seed from the DIV timer register
@@ -63,7 +63,7 @@ SetupGame:
 
     ; set up player
     xor a
-    ld de, player_tilemap
+    ld de, PlayerTileMap
     call ObjInit
     xor a
     ld b, 20

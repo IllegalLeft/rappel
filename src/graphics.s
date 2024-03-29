@@ -635,38 +635,42 @@ MoveRope:
 .ENDS
 
 
-.SECTION "Tiles" FREE
-
-player_tilemap:
-.DB $00, $01, $02, $03
-
-Tiles:
-; player sprites
-.DEFINE tiles_sprites_size  18 * 16
-.EXPORT tiles_sprites_size
-.INCBIN "../gfx/sprites.bin"
-.INCBIN "../gfx/tiles.bin"
 
 .DEFINE TILE_ROPE       $08
 .EXPORT TILE_ROPE
 
-; font
-.DEFINE tiles_font_size 37 * 16
-.EXPORT tiles_font_size
-tiles_font:
+
+.SECTION "GraphicsTiles" FREE
+
+SpriteTiles:
+.INCBIN "../gfx/sprites.bin"
+.INCBIN "../gfx/tiles.bin"
+
+PlayerTileMap:
+.DB $00, $01, $02, $03
+
+
+FontTiles:
 .INCBIN "../gfx/font.bin"
 
-.INCLUDE "title.i"
 
-.DEFINE tiles_cloud_size 8 * 16
-.EXPORT tiles_cloud_size
+TitleTiles:
+.DEFINE title_tile_count  $4C
+.EXPORT title_tile_count
+.INCBIN "../gfx/title.tiles"
 
-tilemap_cloud:
+TitleTileMap:
+.DEFINE title_tile_map_width  $14
+.DEFINE title_tile_map_height  $12
+.INCBIN "../gfx/title.map"
+
+
+CloudTiles:
+.INCBIN "../gfx/cloud.bin"
+
+CloudTileMap:
 .DB $80, $81, $84, $85
 .DB $82, $83, $86, $87
-
-tiles_cloud:
-.INCBIN "../gfx/cloud.bin"
 
 .ENDS
 
