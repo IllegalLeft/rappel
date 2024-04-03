@@ -2,9 +2,9 @@ rem Graphics
 cd gfx
 superfamiconv -M gb -RF -i title1.png -t title.tiles
 superfamiconv -M gb -RF -i title1.png -m title.map
-superfamiconv -B 2 -i cloud.png -t cloud.bin
-superfamiconv -B 2 -i sprites.png -t sprites.bin
-superfamiconv -B 2 -i tiles.png -t tiles.bin -R
+superfamiconv tiles -M gb -R -i cloud.png -d cloud.bin
+superfamiconv tiles -M gb -R -i sprites.png -d sprites.bin
+superfamiconv tiles -M gb -R -i tiles.png -d tiles.bin
 superfamiconv -M gb -RF -i font.png -t font.bin
 cd ..
 
