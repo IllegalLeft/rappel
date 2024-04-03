@@ -5,7 +5,7 @@ superfamiconv -M gb -RF -i title1.png -m title.map
 superfamiconv -B 2 -i cloud.png -t cloud.bin
 superfamiconv -B 2 -i sprites.png -t sprites.bin
 superfamiconv -B 2 -i tiles.png -t tiles.bin -R
-superfamiconv -B 2 -i font.png -t font.bin -R
+superfamiconv -M gb -RF -i font.png -t font.bin
 cd ..
 
 rem Source
