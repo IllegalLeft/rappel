@@ -140,13 +140,30 @@ HandleGameInput:
     ldh a, (<joypadDiff)
     ld b, a             ; store for later
     and JOY_START
-    jr z, @checkright
+    jr z, @checkselect
     ; Start
     ld a, STATE_PAUSE
     ldh (<state), a
     ret                 ; no need to do anything else, game is paused
+@checkselect:
+    ldh a, (<joypadDiff)
+    and JOY_SELECT
+    jr z, @checkright
+    ; Select
+    ldh a, (R_NR52)
+    and %10000000
+    jr z, +
+    call StopAudio
+    jr @checkright
++   ; turn on audio
+    call InitAudio
+    ; ...and reload song stuff
+    ld hl, Song_Rapel
+    call LoadMusic
+    ld hl, Wave_Tri
+    call LoadWaveform
 @checkright:
-    ld a, b
+    ldh a, (<joypadDiff)
     and JOY_RIGHT
     jr z, @checkleft
     ; Right
@@ -154,7 +171,7 @@ HandleGameInput:
     add 2
     ld (player.velx), a
 @checkleft:
-    ld a, b
+    ldh a, (<joypadDiff)
     and JOY_LEFT
     jr z, @checkdown
     ; Left
@@ -163,8 +180,8 @@ HandleGameInput:
     ld (player.velx), a
 @checkdown:
 @checka:
-@checkB:
-    ld a, b
+@checkb:
+    ldh a, (<joypadDiff)
     and JOY_B
     jr z, @handledkeydowns
     ; B

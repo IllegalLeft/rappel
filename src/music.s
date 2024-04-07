@@ -54,6 +54,34 @@ Pitches:
 .SLOT 0
 .SECTION "MusicSubroutines" FREE
 
+InitAudio:
+
+    ldh a, (R_NR52)
+    and %10000000           ; check if audio is already on
+    ret nz
+    ; init audio
+    ld a, %10000000         ; sound on
+    ldh (R_NR52), a
+    ld a, %01000100         ; volume
+    ldh (R_NR50), a
+    ld a, $FF               ; enable all channels to both L&R
+    ldh (R_NR51), a
+    ret
+
+StopAudio:
+    ; Turns off audio processor unit, stopping all sounds
+
+    ldh a, (R_NR52)
+    and %10000000           ; check if audio is on
+    ret z                   ; audio is off already
+    ; turn off audio
+    xor a
+    ldh (R_NR50), a
+    ldh (R_NR51), a
+    ldh (R_NR52), a
+    ret
+
+
 StopMusic:
     ; disabling channels like this is supposed to prevent audio popping
     ld a, $08

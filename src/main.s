@@ -137,18 +137,6 @@ RandByte:
 
 .ENDS
 
-.SECTION "Title Routines" FREE
-
-HandleTitleInput:
-    ldh a, (<joypadDiff)
-    and JOY_START
-    jr z, @done
-    ld a, STATE_GAME
-    ldh (<state), a     ; start the game
-@done:
-    ret
-
-.ENDS
 
 
 ;==============================================================================

@@ -69,13 +69,6 @@ TitleSetup:
     ld a, %10010011         ; setup screen
     ldh (R_LCDC), a
 
-    ld a, %10000000         ; sound on
-    ldh (R_NR52), a
-    ld a, %01000100         ; volume
-    ldh (R_NR50), a
-    ld a, $FF               ; enable all channels to both L&R
-    ldh (R_NR51), a
-
     ld a, $01
     ldh (R_IE), a           ; enable only vblank interrupt
     ei
@@ -131,10 +124,39 @@ TitleSetup:
     ld de, $99A4
     call PrintStr
 
+    call InitAudio
+    ; load music
     ld hl, Song_RapelRedux
     call LoadMusic
     ld hl, Wave_Tri
     call LoadWaveform
+    ret
+
+
+HandleTitleInput:
+    ldh a, (<joypadDiff)
+    and JOY_START
+    jr z, +
+    ld a, STATE_GAME
+    ldh (<state), a     ; start the game
++
+    ldh a, (<joypadDiff)
+    and JOY_SELECT
+    jr z, @done
+    ; Select
+    ldh a, (R_NR52)
+    and %10000000
+    jr z, +
+    call StopAudio
+    jr @done
++   ; turn on audio
+    call InitAudio
+    ; ...and reload song stuff
+    ld hl, Song_RapelRedux
+    call LoadMusic
+    ld hl, Wave_Tri
+    call LoadWaveform
+@done:
     ret
 
 
