@@ -7,6 +7,13 @@
 
 .DEFINE OAMBuffer   _WRAM
 
+
+.RAMSECTION "GraphicsVars" BANK 0 SLOT 3
+    PlayerFrame:            db
+    PlayerFrameCounter:     db
+.ENDS
+
+
 .SECTION "GraphicsCode" FREE
 
 DMARoutineOriginal:
@@ -234,6 +241,32 @@ ObjTile:
 .ENDR
     ret
 
+ObjTileMap:
+    ; Changes an object to a new set of tiles that are in a tile map
+    ; a     obj index
+    ; de    tilemap address
+    ld hl, OAM.1.tile
+    sla a
+    sla a
+    sla a
+    sla a
+    add l
+    ld l, a
+    ld a, 0
+    adc h
+    ld h, a             ; hl is now the address of the tile
+.REPEAT 4
+    ld a, (de)
+    ld (hl), a
+    inc de
+    ld a, 4
+    add l
+    ld l, a
+    ld a, 0
+    adc h
+    ld h, a
+.ENDR
+    ret
 
 
 PlaceCliff:
@@ -632,6 +665,38 @@ MoveRope:
     ret
 
 
+PlayerAnimate:
+    ; Animate player sprite according to velocity
+    ld a, (player.velx)
+    bit 7, a
+    jr z, +
+    cpl a
+    inc a               ; 2s compliment of velx
++
+    sla a
+    sla a
+    sla a
+    ld b, a
+    ld a, (PlayerFrameCounter)
+    add b
+    ld (PlayerFrameCounter), a
+    ret nc               ; did it overflow?
+    ; change the player animation frame
+    ld a, (PlayerFrame)
+    xor 1
+    ld (PlayerFrame), a
+    sla a
+    sla a
+    ld de, PlayerTileMap
+    add e               ; de + (a*4)
+    ld e, a
+    ld a, 0
+    adc d
+    ld d, a
+    ld a, 0             ; OAM meta sprite 0
+    call ObjTileMap
+    ret
+
 .ENDS
 
 
@@ -648,6 +713,7 @@ SpriteTiles:
 
 PlayerTileMap:
 .DB $00, $01, $02, $03
+.DB $04, $05, $06, $07
 
 
 FontTiles:
