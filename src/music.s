@@ -24,8 +24,6 @@
     MusicTimers:        ds  NUM_MUSIC_CHANS
     MusicOctaves:       ds  NUM_MUSIC_CHANS
     MusicVoices:        dsw 3
-
-    SFXCurrent:         db              ; SFX currently playing on channels
 .ENDS
 
 ;==============================================================================
@@ -55,6 +53,7 @@ Pitches:
 .SECTION "MusicSubroutines" FREE
 
 InitAudio:
+    ; Turns on audio processor unit and all channels
 
     ldh a, (R_NR52)
     and %10000000           ; check if audio is already on
@@ -483,6 +482,148 @@ UpdateMusic:
     cp c                        ; done with all channels?
     jp nz, @readSongData
     ret
+
+.ENDS
+
+
+.RAMSECTION "SFX Variables" BANK 0 SLOT 3
+    SFXCurrent:         db              ; SFX currently playing on channels
+    SFXPointer:         dsw APU_CHANNELS
+    SFXTimers:          dsw APU_CHANNELS
+.ENDS
+
+
+.SECTION "SFX Subroutines" FREE
+
+QueueSFX:
+    ; Sets up a sound effect to play.
+    ; hl    SFX address
+
+    ; queue for specified channel
+    ldi a, (hl)             ; get channel #
+    ld c, a
+    ld b, a
+    ld a, $FF
+    and b
+    ld a, 1                 ; start with first bit
+    jr z, +                 ; first channel check
+-   sla a
+    dec b
+    jr nz, -
++   
+    ld b, a
+    ld a, (SFXCurrent)
+    or b                    ; add to sfx queue
+    ld (SFXCurrent), a      ; store sfx queue
+
+    ; setup pointer
+    ld de, SFXPointer
+    ld a, c                 ; c is chan #
+    sla a                   ; x2 for word length
+    add e
+    ld e, a
+    ld a, 0
+    adc d
+    ld d, a
+    ld a, l                 ; store in little endian
+    ld (de), a
+    inc de
+    ld a, h
+    ld (de), a
+
+    ; setup timer
+    ld de, SFXTimers
+    ld a, c                 ; c is chan #
+    add e
+    ld e, a
+    ld a, 0
+    adc d
+    ld d, a
+    ld a, 1                 ; yes, all that to store just 1
+    ld (de), a
+    ret
+
+
+HandleSFX:
+    ; Takes care of playing sound effects.
+    ; check if we need to handle any queued sfx
+    ld a, (SFXCurrent)
+    and %00001111
+    ret z                   ; no sfx to handle
+
+    bit 0, a                ; check channel 0
+    jr z, @checkchan1
+
+    ; check timer 
+    ld de, SFXTimers
+    ld a, (de)
+    dec a
+    ld (de), a
+    jr nz, +
+    
+    ; load in new sfx data
+    ld a, (SFXPointer)      ; get SFX pointer (little endian)
+    ld l, a
+    ld a, (SFXPointer+1)
+    ld h, a
+    ldi a, (hl)             ; get note data
+    cp $FF                  ; if the first byte is $FF...
+    jr nz, ++
+    ld a, (SFXCurrent)      ;...channel 1 is done
+    res 0, a
+    ld (SFXCurrent), a
+    jr +
+++  ldh (R_NR10), a         ; store in sound registers
+    ldi a, (hl)
+    ldh (R_NR11), a
+    ldi a, (hl)
+    ldh (R_NR12), a
+    ldi a, (hl)
+    ldh (R_NR13), a
+    ldi a, (hl)
+    ldh (R_NR14), a
+    ldi a, (hl)             ; get next timer
+    ld de, SFXTimers
+    ld (de), a              ; store timer
+    ld e, l                 ; put address of music data in de...
+    ld d, h
+    ld hl, SFXPointer       ; ...to be stored here (little endian)
+    ld a, e
+    ldi (hl), a
+    ld a, d
+    ld (hl), a
++   ld a, (SFXCurrent)      ; will need this again for next check
+
+@checkchan1:
+    bit 1, a                ; check channel 1
+    jr z, @checkchan2
+    ; TODO
+
+@checkchan2:                ; check channel 2
+    bit 2, a
+    jr z, @checkchan3
+    ; TODO
+
+@checkchan3:                ; check channel 3
+    bit 3, a
+    ret z
+    ;TODO
+
+    ret
+
+.ENDS
+
+
+.SECTION "SFX" FREE
+
+SFX_Pause:
+.DB $00     ; Channel 0 - Pulse 1
+;  NR10 NR11 NR12 NR13 NR14
+.DB $00, $84, $F4, $90, $F7
+.DB $05
+.DB $00, $84, $F1, $B5, $F7
+.DB $05
+.DB $FF
 
 .ENDS
 

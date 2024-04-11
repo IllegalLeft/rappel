@@ -107,8 +107,10 @@
 ; Misc Defines
 ;==============================================================================
 
-.DEFINE SCREEN_W   160
-.DEFINE SCREEN_H   140
+.DEFINE SCREEN_W    160
+.DEFINE SCREEN_H    140
+
+.DEFINE APU_CHANNELS    4
 
 
 ; vim: filetype=wla

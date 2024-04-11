@@ -297,6 +297,8 @@ GameLogic:
 
 PauseSetup:
     call StopMusic
+    ld hl, SFX_Pause    ; queue pause sound
+    call QueueSFX
 
     ; load pause tiles
     ld hl, OAM.33       ; starting OAM address
@@ -347,6 +349,8 @@ PauseLoop:
     ldh (R_LCDC), a
 
     call ReadInput
+
+    call HandleSFX
 
     ; Vertical blank
     halt
