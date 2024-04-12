@@ -489,7 +489,7 @@ UpdateMusic:
 .RAMSECTION "SFX Variables" BANK 0 SLOT 3
     SFXCurrent:         db              ; SFX currently playing on channels
     SFXPointer:         dsw APU_CHANNELS
-    SFXTimers:          dsw APU_CHANNELS
+    SFXTimers:          dsb APU_CHANNELS
 .ENDS
 
 
@@ -551,7 +551,7 @@ HandleSFX:
     and %00001111
     ret z                   ; no sfx to handle
 
-    bit 0, a                ; check channel 0
+    bit 0, a                ; check channel 0 - Pulse 1
     jr z, @checkchan1
 
     ; check timer 
@@ -569,7 +569,7 @@ HandleSFX:
     ldi a, (hl)             ; get note data
     cp $FF                  ; if the first byte is $FF...
     jr nz, ++
-    ld a, (SFXCurrent)      ;...channel 1 is done
+    ld a, (SFXCurrent)      ;...channel 0 is done
     res 0, a
     ld (SFXCurrent), a
     jr +
@@ -594,21 +594,56 @@ HandleSFX:
     ld (hl), a
 +   ld a, (SFXCurrent)      ; will need this again for next check
 
-@checkchan1:
-    bit 1, a                ; check channel 1
+@checkchan1:                ; check channel 1 - Pulse 2
+    bit 1, a
     jr z, @checkchan2
     ; TODO
 
-@checkchan2:                ; check channel 2
+@checkchan2:                ; check channel 2 - Wave
     bit 2, a
     jr z, @checkchan3
     ; TODO
 
-@checkchan3:                ; check channel 3
+@checkchan3:                ; check channel 3 - Noise
     bit 3, a
     ret z
-    ;TODO
 
+    ; check timer 
+    ld de, SFXTimers+3
+    ld a, (de)
+    dec a
+    ld (de), a
+    ret nz
+    
+    ; load in new sfx data
+    ld a, (SFXPointer+6)    ; get SFX pointer (little endian)
+    ld l, a
+    ld a, (SFXPointer+7)
+    ld h, a
+    ldi a, (hl)             ; get note data
+    cp $FF                  ; if the first byte is $FF...
+    jr nz, ++
+    ld a, (SFXCurrent)      ;...channel 3 is done
+    res 3, a
+    ld (SFXCurrent), a
+    ret
+++  ldh (R_NR41), a         ; store in sound registers
+    ldi a, (hl)
+    ldh (R_NR42), a
+    ldi a, (hl)
+    ldh (R_NR43), a
+    ldi a, (hl)
+    ldh (R_NR44), a
+    ldi a, (hl)             ; get next timer
+    ld de, SFXTimers+3
+    ld (de), a              ; store timer
+    ld e, l                 ; put address of music data in de...
+    ld d, h
+    ld hl, SFXPointer+6     ; ...to be stored here (little endian)
+    ld a, e
+    ldi (hl), a
+    ld a, d
+    ld (hl), a
     ret
 
 .ENDS
@@ -622,6 +657,13 @@ SFX_Pause:
 .DB $00, $84, $F4, $90, $F7
 .DB $05
 .DB $00, $84, $F1, $B5, $F7
+.DB $05
+.DB $FF
+
+SFX_Hit:
+.DB $03     ; Channel 3 - Noise
+;  NR41 NR42 NR43 MR44
+.DB $FE, $F2, $80, $A0
 .DB $05
 .DB $FF
 

@@ -381,6 +381,8 @@ GameoverSetup:
     call UpdateHighscore
 
     call StopMusic
+    ld hl, SFX_Hit
+    call QueueSFX
 
     ; load gameover tiles
     ld hl, OAM.33       ; starting OAM address
@@ -438,6 +440,8 @@ Gameover:
     ldh a, (R_LCDC)
     xor %00001000       ; switch map address
     ldh (R_LCDC), a
+
+    call HandleSFX
 
     call ReadInput
 
