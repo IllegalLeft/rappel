@@ -5,6 +5,7 @@
 .ENUM _HRAM EXPORT
     DMARoutine      DSB 10  ; DMA Routine
     ticks           DB
+    gameticks       DB
     state           DB      ; 0 - title
                             ; 1 - game
                             ; 2 - game over

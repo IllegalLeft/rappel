@@ -252,6 +252,11 @@ MainGameLoop:
 
     call UpdateMusic
 
+    ; increment tick counter
+    ldh a, (<gameticks)
+    inc a
+    ldh (<gameticks), a
+
     ; Vertical Blank
     halt
     nop
@@ -260,18 +265,14 @@ MainGameLoop:
     xor %00001000       ; swap to scorebar map
     ldh (R_LCDC), a
 
-    ldh a, (<state)
-    cp STATE_PAUSE
-    jp z, PauseSetup
-
 GameLogic:
-    ldh a, (<ticks)     ; only need to apply x vel every so many frames
+    ldh a, (<gameticks) ; apply x vel every so many frames
     and $01
     jr nz, @noapplyvelx
     call ApplyVelX
 @noapplyvelx:
 
-    ldh a, (<ticks)     ; only need to slow player vel every so many frames
+    ldh a, (<gameticks) ; slow player vel every so many frames
     and $03
     jr nz, @noslow
     call SlowPlayerVel
@@ -283,7 +284,7 @@ GameLogic:
 
     call MoveRope
 
-    xor a               ; clear carry flag for when using daa with scorebar
+    xor a   ; clear carry flag for when using daa with scorebar
     ; update scorebar
     ld a, (score+1)
     ld de, $9C0F
@@ -291,6 +292,10 @@ GameLogic:
     ld a, (score)
     inc de
     call PrintInt
+    
+    ldh a, (<state)
+    cp STATE_PAUSE
+    jp z, PauseSetup
 
     jp MainGameLoop
 

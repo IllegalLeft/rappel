@@ -275,10 +275,6 @@ SlowPlayerVel:
     ld a, (player.velx)
     inc a
     ld (player.velx), a
-++
-
-    ld a, (player.velx)
-    ld (player.velx), a
     ret
 
 
