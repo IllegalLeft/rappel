@@ -36,6 +36,11 @@ SetupGame:
     ld bc, (_sizeof_SpriteTiles+1)
     call MoveData
 
+    ld hl, MapTiles
+    ld de, _VRAM+(16*16)
+    ld bc, (_sizeof_MapTiles)
+    call MoveData
+
     ldh a, (R_DIV)      ; get a random seed from the DIV timer register
     ld (seed), a
 
@@ -134,6 +139,7 @@ SetupGame:
     ldh (R_LCDC), a
     call ScreenFadeIn
     ret
+
 
 HandleGameInput:
     ; Key Down
@@ -324,10 +330,10 @@ CheckCollision:
     call FindMapBuffTile
 
     ldi a, (hl)     ; top left tile
-    cp $0E
+    cp $14
     ret nc
     ld a, (hl)      ; top right tile
-    cp $0E
+    cp $14
     ret nc
     ld a, $14-1     ; bottom left tile is $14 to new line
     add l           ; then -1 to put it back one
@@ -370,11 +376,11 @@ CheckCollision:
 
 
     ld a, (hl)      ; bottom left tile
-    cp $0E
+    cp $14
     ret nc
     inc hl
     ld a, (hl)      ; bottom right tile
-    cp $0E
+    cp $14
     ret nc
 
     ; check collision with objects

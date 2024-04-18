@@ -104,10 +104,10 @@ LoadPicture:
     ret
 
 ; tiles for empty space
-.DEFINE EMPTY_TL    $0A
-.DEFINE EMPTY_TR    $0B
-.DEFINE EMPTY_BL    $0C
-.DEFINE EMPTY_BR    $0D
+.DEFINE EMPTY_TL    $10
+.DEFINE EMPTY_TR    $11
+.DEFINE EMPTY_BL    $12
+.DEFINE EMPTY_BR    $13
 InitMapBuffer:
     ; fills mapbuffer (WRAM) with empty tiles graphics
     ld c, 255
@@ -306,7 +306,7 @@ PlaceCliff:
     adc d
     ld d, a
     ; place top left tile
-    ld a, $0D
+    ld a, $14
     ld (de), a
     ; place top right tile
     inc a
@@ -700,21 +700,25 @@ PlayerAnimate:
 .ENDS
 
 
-
-.DEFINE TILE_ROPE       $08
-.EXPORT TILE_ROPE
+; Tile Definitions
+.DEFINE TILE_ROPE       $08 EXPORT
+.DEFINE TILE_CLIFFTL    $14 EXPORT
+.DEFINE TILE_CLIFFTR    $15 EXPORT
+.DEFINE TILE_CLIFFBL    $16 EXPORT
+.DEFINE TILE_CLIFFBR    $17 EXPORT
 
 
 .SECTION "GraphicsTiles" FREE
 
 SpriteTiles:
 .INCBIN "../gfx/sprites.bin"
-.INCBIN "../gfx/tiles.bin"
 
 PlayerTileMap:
 .DB $00, $01, $02, $03
 .DB $04, $05, $06, $07
 
+MapTiles:
+.INCBIN "../gfx/tiles.bin"
 
 FontTiles:
 .INCBIN "../gfx/font.bin"

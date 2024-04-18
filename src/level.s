@@ -30,12 +30,8 @@ PlaceObstacle:
     ld b, 0
     add hl, bc
 
-.DEFINE CLIFF_TL    $0E
-.DEFINE CLIFF_TR    $0F
-.DEFINE CLIFF_BL    $10
-.DEFINE CLIFF_BR    $11
     ; set tiles
-    ld a, CLIFF_TL
+    ld a, TILE_CLIFFTL
     ldi (hl), a
     inc a
     ldd (hl), a
