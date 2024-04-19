@@ -665,6 +665,24 @@ MoveRope:
     ret
 
 
+MoveRopeDX:
+    ld hl, OAM.9
+    ld a, $18
+    ldi (hl), a
+
+    ld a, SCREEN_W/2+8
+    ld b, a
+    ld a, (player.x)
+    sub b
+    sra a
+    add SCREEN_W/2+16
+    ldi (hl), a
+    
+    ld a, $09
+    ldi (hl), a
+    ret
+
+
 PlayerAnimate:
     ; Animate player sprite according to velocity
     ld a, (player.velx)

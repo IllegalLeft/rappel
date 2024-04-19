@@ -261,6 +261,15 @@ MainGameLoop:
     halt
     nop
 
+    xor a   ; clear carry flag for when using daa with scorebar
+    ; update scorebar
+    ld a, (score+1)
+    ld de, $9C0F
+    call PrintInt
+    ld a, (score)
+    inc de
+    call PrintInt
+
     ldh a, (R_LCDC)
     xor %00001000       ; swap to scorebar map
     ldh (R_LCDC), a
@@ -283,15 +292,6 @@ GameLogic:
     jp nc, GameoverSetup; gameover if side collision
 
     call MoveRope
-
-    xor a   ; clear carry flag for when using daa with scorebar
-    ; update scorebar
-    ld a, (score+1)
-    ld de, $9C0F
-    call PrintInt
-    ld a, (score)
-    inc de
-    call PrintInt
     
     ldh a, (<state)
     cp STATE_PAUSE

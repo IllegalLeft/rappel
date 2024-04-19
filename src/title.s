@@ -91,9 +91,11 @@ TitleSetup:
     ld a, 20
     call WaitFrames
 
+    halt
+    nop
     ; draw title font
     ld b, 20
-    ld c, 8
+    ld c, 4
     ld de, _MAP0+(8*32)
     ld hl, TitleTileMap+(20*8)
     call LoadPicture
