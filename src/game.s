@@ -156,13 +156,18 @@ HandleGameInput:
     and JOY_SELECT
     jr z, @checkright
     ; Select
-    ldh a, (R_NR52)
-    and %10000000
+    ld a, (MusicEnabled)
+    and $FF
     jr z, +
-    call StopAudio
+    call StopMusic
+    xor a
+    ld (MusicEnabled), a
+    ld hl, SFX_Mute
+    call QueueSFX
     jr @checkright
-+   ; turn on audio
-    call InitAudio
++   ; turn on music
+    ld a, $01
+    ld (MusicEnabled), a
     ; ...and reload song stuff
     ld hl, Song_Rapel
     call LoadMusic

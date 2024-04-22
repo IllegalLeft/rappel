@@ -18,6 +18,7 @@
 .DEFINE NUM_MUSIC_CHANS     4           ; total number of virtual music channels
 
 .RAMSECTION "MusicVars" BANK 0 SLOT 3   ; Internal WRAM
+    MusicEnabled:       db
     MusicTicks:         db
     MusicTickLimit:     db
     MusicPointer:       dsw NUM_MUSIC_CHANS
@@ -75,6 +76,7 @@ StopAudio:
     ret z                   ; audio is off already
     ; turn off audio
     xor a
+    ld (MusicEnabled), a
     ldh (R_NR50), a
     ldh (R_NR51), a
     ldh (R_NR52), a
@@ -164,6 +166,11 @@ LoadMusic:
     ret
 
 UpdateMusic:
+    ; check if music is enabled
+    ld a, (MusicEnabled)
+    and $FF
+    ret z
+
     ; check to see update is needed (counter will equal ticks)
     ld a, (MusicTickLimit)
     ld b, a
@@ -664,6 +671,14 @@ SFX_Hit:
 .DB $03     ; Channel 3 - Noise
 ;  NR41 NR42 NR43 MR44
 .DB $FE, $F2, $80, $A0
+.DB $05
+.DB $FF
+
+SFX_Mute:
+.DB $00     ; Channel 0 - Pulse 1
+.DB $00, $84, $F1, $B5, $F7
+.DB $05
+.DB $00, $84, $F4, $90, $F7
 .DB $05
 .DB $FF
 

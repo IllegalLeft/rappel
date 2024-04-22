@@ -184,10 +184,15 @@ Start:
     ld bc, _sizeof_FontTiles
     call MoveData
 
+    ; set up music as default
+    ld a, $01
+    ld (MusicEnabled), a
+
     xor a
     ld hl, highscore        ; blank highscore
     ldi (hl), a
     ld (hl), a
+
     jr Title
 
 
@@ -221,6 +226,7 @@ TitleLoop:
     call ReadInput
     call HandleTitleInput
     call UpdateMusic
+    call HandleSFX
 
     ldh a, (<ticks)
     and $07
@@ -251,6 +257,7 @@ MainGameLoop:
     call HandleGameInput
 
     call UpdateMusic
+    call HandleSFX
 
     ; increment tick counter
     ldh a, (<gameticks)
